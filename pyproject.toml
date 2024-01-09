@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "llm-playground"
+version = "0.1.0"
+description = ""
+authors = ["Jean-baptiste Aujogue"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+pandas = "^2.1.4"
+numpy = "^1.26.2"
+openpyxl = "^3.1.2"
+pyarrow = "^14.0.2"
+matplotlib = "^3.8.2"
+jupyter = "^1.0.0"
+ipykernel = "^6.28.0"
+jupytext = "^1.16.0"
+torch = {version = "^2.1.2+cu121", source = "pytorch-gpu-src"}
+torchvision = {version = "^0.16.2+cu121", source = "pytorch-gpu-src"}
+torchaudio = {version = "^2.1.2+cu121", source = "pytorch-gpu-src"}
+sentence-transformers = "^2.2.2"
+optimum = {extras = ["onnxruntime"], version = "^1.16.1"}
+sacremoses = "^0.1.1"
+langchain = "^0.0.353"
+accelerate = "^0.25.0"
+bitsandbytes = "^0.41.3.post2"
+autoawq = "^0.1.8"
+auto-gptq = "^0.6.0"
+
+
+
+[tool.poetry.group.dev.dependencies]
+
+
+[[tool.poetry.source]]
+name = "pytorch-gpu-src"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
