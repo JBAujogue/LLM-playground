@@ -12,60 +12,138 @@ panel serve apps/simple-chat-panel.py
 
 import panel as pn
 from langchain.chains import LLMChain
-from langchain.llms import CTransformers
 from langchain.prompts import PromptTemplate
 
 pn.extension()
 
-engine = 'ctransformers'
-model_dict = {
-    'zephyr-7b-gptq': {
-        "model": 'TheBloke/zephyr-7B-beta-GPTQ',
-    },
-    'zephyr-7b-gguf': {
-        "model": 'TheBloke/zephyr-7B-beta-GGUF',
-    },
+
+
+
+
+# ------------- ctransformers ---------------
+MODEL_ARGUMENTS = {
+    # "zephyr-7b-gptq-cuda": {
+    #     "args": ["TheBloke/zephyr-7B-beta-GPTQ"],
+    #     "kwargs": dict(
+    #         model_type = "gptq",
+    #     ),
+    # },
+    "zephyr-7b-gguf-cpu": dict(
+        args = ["TheBloke/zephyr-7B-beta-GGUF"],
+        kwargs = dict(
+            model_file = "zephyr-7b-beta.Q5_K_M.gguf",
+        ),
+    ),
 }
-generation_config = dict(max_new_tokens = 256, temperature = 0.5)
-llm_chains = {}
-template = """<s>[INST] You are a friendly chat bot who's willing to help answer the
-user:
-{user_input} [/INST] </s>
-"""
 
 
-def create_model(engine: str, model_config: dict, generation_config: dict):
-    if engine == 'ctransformers':
-        return CTransformers(**model_config, config = generation_config)
-    else:
-        raise NotImplementedError(
-            '''
-            accepted engine are: 
-            - 'ctransformers'
-            '''
+def load_ctransformers_model(model_args):
+    from ctransformers import AutoModelForCausalLM
+    return AutoModelForCausalLM.from_pretrained(
+                *model_args["args"],
+                **model_args["kwargs"],
+            )
+
+
+async def callback_ctransformers(
+    query: str, user: str, instance: pn.chat.ChatInterface,
+    ):
+    for model, model_args in MODEL_ARGUMENTS.items():
+        # load model in app state cache
+        if model not in pn.state.cache:
+            pn.state.cache[model] = load_ctransformers_model(model_args)
+        # select model
+        llm = pn.state.cache[model]
+        
+        # wrap content into template on-the-fly
+        system = 'Answer the user query, in french, in minimalistic style.'
+        prompt = f'''<|system|>\n{system}</s>\n<|user|>\n{query}</s>\n<|assistant|>'''
+        
+        # request response
+        response = llm(
+            prompt, **pn.state.cache['generation_config'],
         )
+        # stream response on chat interface
+        message = None
+        for chunk in response:
+            message = instance.stream(
+                chunk, user = model.title(), message = message,
+            )
 
-async def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
+
+
+
+# ------------- langchain wrapper for ctransformers ---------------
+langchain_ctransformers_model_args = {
+    "zephyr-7b-gguf-cpu": dict(
+        model = "TheBloke/zephyr-7B-beta-GGUF",
+        model_file = "zephyr-7b-beta.Q5_K_M.gguf",
+    ),
+}
+
+
+def load_langchain_ctransformers_model(model_args, config: dict = {}):
     '''
+    see source code at
+    https://api.python.langchain.com/en/latest/llms/langchain_community.llms.ctransformers.CTransformers.html?highlight=ctransformers
     '''
-    for model, model_config in model_dict.items():
-        if model not in llm_chains:
-            instance.placeholder_text = (f"Downloading {model}")
-            llm = create_model(engine, model_config, generation_config)
-            prompt = PromptTemplate(template = template, input_variables=["user_input"])
-            llm_chain = LLMChain(prompt = prompt, llm = llm)
-            llm_chains[model] = llm_chain
+    from langchain.llms import CTransformers
+    return CTransformers(
+        **model_args, config = config,
+    )
+
+
+async def callback_langchain_ctransformers(
+    contents: str, user: str, instance: pn.chat.ChatInterface,
+    ):
+    for model, model_args in langchain_ctransformers_model_args.items():
+        # load model in app state cache
+        if model not in pn.state.cache:
+            llm = load_langchain_ctransformers_model(
+                model_args, pn.state.cache['generation_config'],
+            )
+            
+            # predefine template wrapper
+            template = '''<|system|>\n{system}</s>\n<|user|>\n{query}</s>\n<|assistant|>'''
+            prompt = PromptTemplate(
+                template = template, input_variables = ['system', 'query'],
+            )
+            # put model into cache
+            pn.state.cache[model] = LLMChain(llm = llm, prompt = prompt)
+        
+        # select model
+        llm = pn.state.cache[model]
+        
+        # define system profile
+        system = 'Answer the user query, in french, in minimalistic style.'
+
+        # request and send response on chat interface.
+        # as of 01/2024, langchain + ctransformers doesn't 
+        # support streaming, see updates at
+        # https://python.langchain.com/docs/integrations/llms/
         instance.send(
-            await llm_chains[model].apredict(user_input = contents),
+            await llm.apredict(system = system, query = contents),
             user = model.title(),
             respond = False,
         )
 
 
-chat_interface = pn.chat.ChatInterface(callback = callback, placeholder_threshold = 0.1)
+
+# ------------- chat interface ---------------
+if 'generation_config' not in pn.state.cache:
+    pn.state.cache['generation_config'] = dict(
+        max_new_tokens = 32,
+        stream = True,
+    )
+
+
+chat_interface = pn.chat.ChatInterface(
+    callback = callback_ctransformers,
+    callback_exception = 'verbose',
+)
 chat_interface.send(
-    "Send a message to get a reply from Zephyr-7B!",
+    "Send a message to get a reply from both Llama 2 and Mistral (7B)!",
     user = "System",
-    respond=False,
+    respond = False,
 )
 chat_interface.servable()

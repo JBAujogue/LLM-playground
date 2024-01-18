@@ -439,4 +439,46 @@ jupyter notebook
 
 
 
-
+<table style="height:100%; width:100%; text-align:center;">
+    <thead>
+        <tr>
+            <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">Asset references</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="font-size:20px">Inference</td>
+            <td style="font-size:20px">Leverage external source</td>
+            <td style="font-size:20px">Multi-turn interaction</td>
+            <td style="font-size:20px">Reasoning & intermediate steps</td>
+            <td style="font-size:20px">Agents</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://sophiamyang.medium.com/building-ai-chatbots-with-mistral-and-llama2-9c0f5abc296c">
+                ✅ Building AI Chatbots with Mistral and Llama2
+                </a>
+                <a href="https://betterprogramming.pub/frameworks-for-serving-llms-60b7f7b23407">
+                🔲 7 Frameworks for Serving LLMs
+                </a>
+            </td>
+            <td>
+                <a href="https://blog.llamaindex.ai/a-cheat-sheet-and-some-recipes-for-building-advanced-rag-803a9d94c41b">
+                🔲 A Cheat Sheet and Some Recipes For Building Advanced RAG
+                </a>
+                <a href="https://towardsdatascience.com/why-are-advanced-rag-methods-crucial-for-the-future-of-ai-462e0dc5a208">
+                🔲 Why Are Advanced RAG Methods Crucial for the Future of AI?
+                </a>
+                
+            </td>
+            <td> </td>
+            <td> </td>
+            <td>
+                <a href="https://github.com/run-llama/llama-lab">
+                🔲 Llama-lab
+                </a>
+            </td>
+        </tr>
+        <tr>
+    </tbody>
+</table>
