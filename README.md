@@ -469,7 +469,6 @@ jupyter notebook
                 <a href="https://towardsdatascience.com/why-are-advanced-rag-methods-crucial-for-the-future-of-ai-462e0dc5a208">
                 🔲 Why Are Advanced RAG Methods Crucial for the Future of AI?
                 </a>
-                
             </td>
             <td> </td>
             <td> </td>
