@@ -1,7 +1,7 @@
-```
+"""
 finetuning job inspired from
 https://python.plainenglish.io/intruct-fine-tuning-mistral-7b-model-with-your-custom-data-7eb22921a483
-```
+"""
 
 ## Package Versions
 # * transformers==4.35.0

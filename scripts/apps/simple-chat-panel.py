@@ -6,16 +6,13 @@ a list of LLMs. Taking inspiration from
 https://sophiamyang.medium.com/building-ai-chatbots-with-mistral-and-llama2-9c0f5abc296c
 Run it with
 ```
-panel serve apps/simple-chat-panel.py
+panel serve scripts/apps/simple-chat-panel.py
 ```
 """
 
 import panel as pn
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-
-pn.extension()
-
 
 
 
@@ -136,6 +133,8 @@ if 'generation_config' not in pn.state.cache:
         stream = True,
     )
 
+
+pn.extension()
 
 chat_interface = pn.chat.ChatInterface(
     callback = callback_ctransformers,

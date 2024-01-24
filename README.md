@@ -109,6 +109,7 @@ jupyter notebook
             </td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 2. Quantization ------------------>
     <thead>
@@ -198,6 +199,7 @@ jupyter notebook
             <td></td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 3. Evaluation ------------------>
     <thead>
@@ -219,6 +221,7 @@ jupyter notebook
             <td href="https://github.com/mlabonne/llm-autoeval">repo</td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 4. Prompt Engineering ------------------>
     <thead>
@@ -246,6 +249,7 @@ jupyter notebook
             <td>Prompt injection</td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 5. Data Ingestion ------------------>
     <thead>
@@ -271,6 +275,7 @@ jupyter notebook
             </td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 6. Retrieval-Augmented Generation ------------------>
     <thead>
@@ -298,6 +303,7 @@ jupyter notebook
             <td>self-RAG</td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 7. Finetuning ------------------>
     <thead>
@@ -368,7 +374,26 @@ jupyter notebook
             <td> </td>
             <td> </td>
         </tr>
+        <! ----------------- 7.2 Frameworks ------------------>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> </th></tr>
+        <tr>
+            <td style="font-size:20px">Framework</td>
+            <td style="font-size:20px">Documentation</td>
+            <td style="font-size:20px">Examples</td>
+            <td style="font-size:20px">Paper</td>
+        </tr>
+        <tr>
+            <td>HF autotrain-advanced</td>
+            <td>
+                <a href="https://github.com/huggingface/autotrain-advanced">
+                Github
+                </a>
+            </td>
+            <td> </td>
+            <td> </td>
+        </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 8. Model aggregation ------------------>
     <thead>
@@ -403,6 +428,7 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
     <! ----------------- 9. Agents ------------------>
     <thead>
@@ -481,3 +507,6 @@ jupyter notebook
         <tr>
     </tbody>
 </table>
+
+
+https://python.plainenglish.io/intruct-fine-tuning-mistral-7b-model-with-your-custom-data-7eb22921a483
