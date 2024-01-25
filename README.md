@@ -179,6 +179,16 @@ jupyter notebook
             </td>
         </tr>
         <tr>
+            <td>SqueezeLLM</td>
+            <td> </td>
+            <td> </td>            
+            <td>
+                <a href="https://arxiv.org/pdf/2306.07629.pdf">
+                    <div style="text-align: center;">2306</div>
+                </a>
+            </td>
+        </tr>
+        <tr>
             <td>EXL2</td>
             <td>
                 <a href="https://github.com/turboderp/exllamav2">Github</a>
@@ -197,7 +207,7 @@ jupyter notebook
                 <a href="https://towardsdatascience.com/run-mixtral-8x7b-on-consumer-hardware-with-expert-offloading-bd3ada394688">HQQ for Mixtral</a>
             </td>
             <td></td>
-        </tr>
+        </tr>        
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
