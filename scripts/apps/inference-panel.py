@@ -13,9 +13,23 @@ from omegaconf import OmegaConf
 
 
 
+
 # ------------- loaders ---------------
+def load_huggingface_pipeline(model_config):
+    from transformers import pipeline
+    return pipeline(**model_config)
+
+
+def load_huggingface_model(model_config):
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(**model_config)
+    model = AutoModelForCausalLM.from_pretrained(**model_config)
+    return (tokenizer, model)
+
+
 def load_ctransformers_model(model_config):
     from ctransformers import AutoModelForCausalLM
+    print(**model_config)
     return AutoModelForCausalLM.from_pretrained(**model_config)
 
 
@@ -29,18 +43,38 @@ def load_langchain_ctransformers_model(model_config):
 
 
 loader_mapping = {
+    'huggingface': load_huggingface_model,
+    'huggingface-pipeline': load_huggingface_pipeline,
     'ctransformers': load_ctransformers_model,
     'langchain-ctransformers': load_langchain_ctransformers_model,
 }
 
 
+
+
 # ------------- inference wrappers ---------------
+async def run_huggingface_inference(llm, prompt_config, generation_config):
+    tokenizer, model = llm
+    return
+
+
+async def run_huggingface_pipeline_inference(llm, prompt_config, generation_config):
+    message = [
+        dict(role = k, content = v)
+        for k, v in prompt_config['fields'].items()
+    ]
+    message = llm.tokenizer.apply_chat_template(
+        message, tokenize = False, add_generation_prompt = True
+    )
+    return llm(message, **generation_config)[0]["generated_text"]
+
+
 async def run_ctransformers_inference(llm, prompt_config, generation_config):
     prompt = prompt_config['template'].format(**prompt_config['fields'])
     return llm(prompt, **generation_config)
 
 
-async def run_langchain_ctransformers_inference(llm, prompt_config, generation_config):
+def run_langchain_ctransformers_inference(llm, prompt_config, generation_config):
     from langchain.chains import LLMChain
     from langchain.prompts import PromptTemplate
             
@@ -53,6 +87,8 @@ async def run_langchain_ctransformers_inference(llm, prompt_config, generation_c
 
 
 inference_mapping = {
+    'huggingface': run_huggingface_inference,
+    'huggingface-pipeline': run_huggingface_pipeline_inference,
     'ctransformers': run_ctransformers_inference,
     'langchain-ctransformers': run_langchain_ctransformers_inference,
 }
@@ -76,7 +112,12 @@ async def callback(
         
         # set prompt and generation config
         prompt_config = model_args['prompt_config']
-        prompt_config['fields'] |= {'query': query}
+        prompt_config = prompt_config if prompt_config else {}
+        prompt_config = {
+            k: (v if v else {})
+            for k, v in prompt_config.items()
+        }
+        prompt_config['fields'] |= {'user': query}
         
         generation_config = model_args['generation_config']
         generation_config = generation_config if generation_config else {}
@@ -107,8 +148,19 @@ def parse_model_config_from_cli():
     return OmegaConf.to_object(OmegaConf.load(model_config_filepath))
 
 
+model_list = [
+    # 'zephyr-7b-gguf-cpu',
+    # 'zephyr-7b-gguf-cpu-2',
+    'mistral-7b-instruct-v0.2-gguf-cpu',
+]
+
 if 'model_config_list' not in pn.state.cache:
-    pn.state.cache['model_config_list'] = parse_model_config_from_cli()
+    model_config_list = parse_model_config_from_cli()
+    model_config_list = [
+        cfg for cfg in model_config_list
+        if list(cfg)[0] in model_list
+    ]
+    pn.state.cache['model_config_list'] = model_config_list
 
 
 pn.extension()
