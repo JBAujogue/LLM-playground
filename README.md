@@ -76,7 +76,10 @@ jupyter notebook
         <tr>
             <td>vLLM (service)</td>
             <td><a href="https://github.com/vllm-project/vllm">Github</a></td>
-            <td><a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a></td>
+            <td>
+                <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a>, 
+                <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>
+            </td>
             <td><a href="https://arxiv.org/pdf/2309.06180.pdf">2309</a></td>
         </tr>
         <tr>
