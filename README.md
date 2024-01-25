@@ -74,6 +74,12 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr>
+            <td>DeepSparse</td>
+            <td><a href="https://github.com/neuralmagic/deepsparse">Github</a></td>
+            <td> </td>
+            <td> </td>
+        </tr>
+        <tr>
             <td>vLLM (service)</td>
             <td>
                 <a href="https://github.com/vllm-project/vllm">Github</a>,
@@ -123,10 +129,10 @@ jupyter notebook
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
-    <! ----------------- 2. Quantization ------------------>
+    <! ----------------- 2. Compression, Quantization ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="text-align:center; font-size:30px">2. Quantization</th>
+            <th colspan=4; style="text-align:center; font-size:30px">2. Compression, Quantization</th>
         </tr>
     </thead>
     <tbody>
@@ -135,6 +141,16 @@ jupyter notebook
             <td style="font-size:20px">Documentation</td>
             <td style="font-size:20px">Examples</td>
             <td style="font-size:20px">Paper</td>
+        </tr>
+        <tr>
+            <td>SparseML</td>
+            <td> 
+                <a href="https://github.com/neuralmagic/sparseml">
+                    <div style="text-align: center;">Github</div>
+                </a>
+            </td>
+            <td> </td>            
+            <td> </td>
         </tr>
         <tr>
             <td>BitsAndBytes</td>
