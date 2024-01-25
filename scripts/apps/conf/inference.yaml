@@ -1,0 +1,52 @@
+- zephyr-7b-gguf-cpu:
+    engine: ctransformers
+
+    model_config:
+      model_path_or_repo_id: TheBloke/zephyr-7B-beta-GGUF
+      model_file: zephyr-7b-beta.Q5_K_M.gguf
+      model_type: mistral
+
+    prompt_config:
+      template: '''<|system|>\n{system}</s>\n<|user|>\n{query}</s>\n<|assistant|>'''
+      fields:
+        system: 'Answer the user query, in french, in minimalistic style.'
+
+    generation_config:
+      max_new_tokens: 32
+      stream: true
+
+    panel_config:
+      stream: true
+
+
+- zephyr-7b-gguf-cpu-2:
+    engine: langchain-ctransformers
+
+    model_config:
+      model: TheBloke/zephyr-7B-beta-GGUF
+      model_file: zephyr-7b-beta.Q5_K_M.gguf
+
+    prompt_config:
+      template: '''<|system|>\n{system}</s>\n<|user|>\n{query}</s>\n<|assistant|>'''
+      input_variables:
+        - system
+        - query
+      fields:
+        system: 'Answer the user query, in french, in minimalistic style.'
+
+    generation_config:
+      max_new_tokens: 32
+    
+    panel_config:
+      stream: false
+
+
+# - zephyr-7b-gptq-cuda:
+#   loader: transformers-pipeline
+#   device: &device cuda
+#   config:
+#     kwargs:
+#       task: text-generation
+#       model: TheBloke/zephyr-7B-beta-GPTQ
+#       device_map: *device
+

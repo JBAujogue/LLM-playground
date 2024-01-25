@@ -34,6 +34,8 @@ trl = "0.7.4"
 fastapi = "^0.109.0"
 uvicorn = "^0.26.0"
 requests = "^2.31.0"
+fire = "^0.5.0"
+omegaconf = "^2.3.0"
 
 
 
