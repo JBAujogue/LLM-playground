@@ -80,6 +80,12 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr>
+            <td>Llama-cpp-python</td>
+            <td><a href="https://github.com/abetlen/llama-cpp-python">Github</a></td>
+            <td> </td>
+            <td> </td>
+        </tr>
+        <tr>
             <td>vLLM (service)</td>
             <td>
                 <a href="https://github.com/vllm-project/vllm">Github</a>,
