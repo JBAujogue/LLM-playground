@@ -77,7 +77,7 @@ jupyter notebook
             <td>vLLM (service)</td>
             <td><a href="https://github.com/vllm-project/vllm">Github</a></td>
             <td> </td>
-            <td> </td>
+            <td><a href="https://arxiv.org/pdf/2309.06180.pdf">2309</a></td>
         </tr>
         <tr>
             <td>LangChain (framework)</td>
