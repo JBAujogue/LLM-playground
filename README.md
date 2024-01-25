@@ -75,7 +75,10 @@ jupyter notebook
         </tr>
         <tr>
             <td>vLLM (service)</td>
-            <td><a href="https://github.com/vllm-project/vllm">Github</a></td>
+            <td>
+                <a href="https://github.com/vllm-project/vllm">Github</a>,
+                <a href="https://www.anyscale.com/blog/continuous-batching-llm-inference">Inference speed blog post</a>
+            </td>
             <td>
                 <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a>, 
                 <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>
