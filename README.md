@@ -74,13 +74,19 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr>
-            <td>LangChain</td>
+            <td>vLLM (service)</td>
+            <td><a href="https://github.com/vllm-project/vllm">Github</a></td>
+            <td> </td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>LangChain (framework)</td>
             <td> </td>
             <td> </td>
             <td> </td>
         </tr>
         <tr>
-            <td>Llama-index</td>
+            <td>Llama-index (framework)</td>
             <td>
                 <a href="https://github.com/run-llama/llama_index">Github</a>,
                 <a href="https://docs.llamaindex.ai/en/stable/">Documentation</a>
