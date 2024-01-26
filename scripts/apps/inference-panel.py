@@ -1,7 +1,11 @@
 """
 Demonstrates how to use the ChatInterface widget to create a chatbot using
-a list of LLMs. Taking inspiration from 
-https://sophiamyang.medium.com/building-ai-chatbots-with-mistral-and-llama2-9c0f5abc296c
+a list of LLMs.
+References:
+- https://sophiamyang.medium.com/building-ai-chatbots-with-mistral-and-llama2-9c0f5abc296c
+- https://blog.holoviz.org/posts/mixtral/
+- https://huggingface.co/blog/sophiamyang/tweak-mpl-chat
+
 Run it with
 ```
 panel serve scripts/apps/inference-panel.py --autoreload --show --args scripts/apps/conf/inference.yaml
@@ -15,6 +19,20 @@ from omegaconf import OmegaConf
 
 
 # ------------- loaders ---------------
+def load_ctransformers_model(model_config):
+    from ctransformers import AutoModelForCausalLM
+    return AutoModelForCausalLM.from_pretrained(**model_config)
+
+
+def load_langchain_ctransformers_model(model_config):
+    '''
+    see source code at
+    https://api.python.langchain.com/en/latest/llms/langchain_community.llms.ctransformers.CTransformers.html?highlight=ctransformers
+    '''
+    from langchain.llms import CTransformers
+    return CTransformers(**model_config)
+
+
 def load_huggingface_pipeline(model_config):
     from transformers import pipeline
     return pipeline(**model_config)
@@ -26,20 +44,6 @@ def load_huggingface_model(model_config):
     model = AutoModelForCausalLM.from_pretrained(**model_config)
     return (tokenizer, model)
 
-
-def load_ctransformers_model(model_config):
-    from ctransformers import AutoModelForCausalLM
-    print(**model_config)
-    return AutoModelForCausalLM.from_pretrained(**model_config)
-
-
-def load_langchain_ctransformers_model(model_config):
-    '''
-    see source code at
-    https://api.python.langchain.com/en/latest/llms/langchain_community.llms.ctransformers.CTransformers.html?highlight=ctransformers
-    '''
-    from langchain.llms import CTransformers
-    return CTransformers(**model_config)
 
 
 loader_mapping = {
@@ -53,28 +57,12 @@ loader_mapping = {
 
 
 # ------------- inference wrappers ---------------
-async def run_huggingface_inference(llm, prompt_config, generation_config):
-    tokenizer, model = llm
-    return
-
-
-async def run_huggingface_pipeline_inference(llm, prompt_config, generation_config):
-    message = [
-        dict(role = k, content = v)
-        for k, v in prompt_config['fields'].items()
-    ]
-    message = llm.tokenizer.apply_chat_template(
-        message, tokenize = False, add_generation_prompt = True
-    )
-    return llm(message, **generation_config)[0]["generated_text"]
-
-
 async def run_ctransformers_inference(llm, prompt_config, generation_config):
     prompt = prompt_config['template'].format(**prompt_config['fields'])
     return llm(prompt, **generation_config)
 
 
-def run_langchain_ctransformers_inference(llm, prompt_config, generation_config):
+async def run_langchain_ctransformers_inference(llm, prompt_config, generation_config):
     from langchain.chains import LLMChain
     from langchain.prompts import PromptTemplate
             
@@ -82,8 +70,32 @@ def run_langchain_ctransformers_inference(llm, prompt_config, generation_config)
     prompt = PromptTemplate(**prompt_config)
     # put into chain
     llm = LLMChain(llm = llm, prompt = prompt)
+    return llm.predict(**prompt_config['fields'])
+
+
+async def run_huggingface_pipeline_inference(llm, prompt_config, generation_config):
+    if 'stream' in generation_config:
+        if generation_config['stream']:
+            from transformers import TextStreamer
+            generation_config['streamer'] = TextStreamer(
+                llm.tokenizer, skip_prompt = True, skip_special_tokens = True,
+            )
+        generation_config.pop('stream')
     
-    return llm.apredict(**prompt_config['fields'])
+    message = [
+        dict(role = k, content = v)
+        for k, v in prompt_config['fields'].items()
+    ]
+    message = llm.tokenizer.apply_chat_template(
+        message, tokenize = False, add_generation_prompt = False
+    )
+    return llm(message, **generation_config)[0]['generated_text']
+
+
+async def run_huggingface_inference(llm, prompt_config, generation_config):
+    tokenizer, model = llm
+    return
+
 
 
 inference_mapping = {
@@ -112,28 +124,27 @@ async def callback(
         
         # set prompt and generation config
         prompt_config = model_args['prompt_config']
-        prompt_config = prompt_config if prompt_config else {}
-        prompt_config = {
-            k: (v if v else {})
-            for k, v in prompt_config.items()
-        }
+        prompt_config = prompt_config or {}
+        prompt_config = {k: (v or {}) for k, v in prompt_config.items()}
         prompt_config['fields'] |= {'user': query}
         
         generation_config = model_args['generation_config']
-        generation_config = generation_config if generation_config else {}
+        generation_config = generation_config or {}
         
         # request response
         response = await inference_mapping[engine](llm, prompt_config, generation_config)
-        
+
        # send response to app
         stream = model_args['panel_config']['stream']
         if stream:
+            # stream response
             message = None
             for chunk in response:
                 message = instance.stream(
                     chunk, user = model_name, message = message,
                 )
         else:
+            # send response
             instance.send(response, user = model_name, respond = False)
 
 
@@ -142,6 +153,7 @@ async def callback(
 def parse_model_config_from_cli():
     # parse config filepath, supposed to appear first after --args 
     parser = argparse.ArgumentParser()
+    print(parser.parse_known_args())
     model_config_filepath = parser.parse_known_args()[-1][0]
     
     # load config
@@ -149,9 +161,10 @@ def parse_model_config_from_cli():
 
 
 model_list = [
-    # 'zephyr-7b-gguf-cpu',
-    # 'zephyr-7b-gguf-cpu-2',
-    'mistral-7b-instruct-v0.2-gguf-cpu',
+    # 'zephyr-7b-gguf-ctransformers-cpu',
+    # 'mistral-7b-instruct-v0.2-gguf-ctransformers-cpu',
+    # 'zephyr-7b-gguf-langchain-ctransformers-cpu',
+    # 'mistral-7b-instruct-v0.2-gptq-huggingface-pipeline-cuda',
 ]
 
 if 'model_config_list' not in pn.state.cache:
@@ -169,8 +182,8 @@ chat_interface = pn.chat.ChatInterface(
     callback_exception = 'verbose',
 )
 chat_interface.send(
-    "Send a message to get a reply from LLMs!",
-    user = "System",
+    "Send a message to get a reply from LLMs!", 
+    user = "System", 
     respond = False,
 )
 chat_interface.servable()

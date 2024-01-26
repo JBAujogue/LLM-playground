@@ -121,6 +121,16 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr>
+            <td>Jan (product)</td>
+            <td> 
+                <a href="https://github.com/janhq/jan/tree/dev">
+                Github
+                </a>
+            </td>
+            <td> </td>
+            <td> </td>
+        </tr>
+        <tr>
             <td colspan=4; style="font-size:20px">
                 - Further readings -
             </td>

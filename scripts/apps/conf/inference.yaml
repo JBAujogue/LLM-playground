@@ -1,4 +1,5 @@
-- zephyr-7b-gguf-cpu:
+# ctransformers
+- zephyr-7b-gguf-ctransformers-cpu:
     engine: ctransformers
     model_config:
       model_path_or_repo_id: TheBloke/zephyr-7B-beta-GGUF
@@ -15,7 +16,26 @@
       stream: true
 
 
-- zephyr-7b-gguf-cpu-2:
+- mistral-7b-instruct-v0.2-gguf-ctransformers-cpu:
+    engine: ctransformers
+    model_config:
+      model_path_or_repo_id: TheBloke/Mistral-7B-Instruct-v0.2-GGUF
+      model_file: mistral-7b-instruct-v0.2.Q6_K.gguf
+      model_type: mistral
+    prompt_config:
+      template: '''<s>[INST] {user} [/INST]'''
+      input_variables:
+        - user
+      fields:
+    generation_config:
+      max_new_tokens: 1024
+      stream: true
+    panel_config:
+      stream: true
+
+
+# langchain-ctransformers
+- zephyr-7b-gguf-langchain-ctransformers-cpu:
     engine: langchain-ctransformers
     model_config:
       model: TheBloke/zephyr-7B-beta-GGUF
@@ -33,12 +53,13 @@
       stream: false
 
 
-- mistral-7b-instruct-v0.2-gguf-cpu:
-    engine: ctransformers
+# huggingface-pipeline
+- mistral-7b-instruct-v0.2-gptq-huggingface-pipeline-cuda:
+    engine: huggingface-pipeline
     model_config:
-      model_path_or_repo_id: TheBloke/Mistral-7B-Instruct-v0.2-GGUF
-      model_file: mistral-7b-instruct-v0.2.Q6_K.gguf
-      model_type: mistral
+      task: text-generation
+      model: TheBloke/Mistral-7B-Instruct-v0.2-GPTQ
+      device_map: cuda
     prompt_config:
       template: '''<s>[INST] {user} [/INST]'''
       input_variables:
