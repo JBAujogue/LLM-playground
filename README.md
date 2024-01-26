@@ -74,13 +74,37 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr>
-            <td>LangChain</td>
+            <td>DeepSparse</td>
+            <td><a href="https://github.com/neuralmagic/deepsparse">Github</a></td>
+            <td> </td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>Llama-cpp-python</td>
+            <td><a href="https://github.com/abetlen/llama-cpp-python">Github</a></td>
+            <td> </td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>vLLM (service)</td>
+            <td>
+                <a href="https://github.com/vllm-project/vllm">Github</a>,
+                <a href="https://www.anyscale.com/blog/continuous-batching-llm-inference">Inference speed blog post</a>
+            </td>
+            <td>
+                <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a>, 
+                <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>
+            </td>
+            <td><a href="https://arxiv.org/pdf/2309.06180.pdf">2309</a></td>
+        </tr>
+        <tr>
+            <td>LangChain (framework)</td>
             <td> </td>
             <td> </td>
             <td> </td>
         </tr>
         <tr>
-            <td>Llama-index</td>
+            <td>Llama-index (framework)</td>
             <td>
                 <a href="https://github.com/run-llama/llama_index">Github</a>,
                 <a href="https://docs.llamaindex.ai/en/stable/">Documentation</a>
@@ -111,10 +135,10 @@ jupyter notebook
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
-    <! ----------------- 2. Quantization ------------------>
+    <! ----------------- 2. Compression, Quantization ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="text-align:center; font-size:30px">2. Quantization</th>
+            <th colspan=4; style="text-align:center; font-size:30px">2. Compression, Quantization</th>
         </tr>
     </thead>
     <tbody>
@@ -123,6 +147,16 @@ jupyter notebook
             <td style="font-size:20px">Documentation</td>
             <td style="font-size:20px">Examples</td>
             <td style="font-size:20px">Paper</td>
+        </tr>
+        <tr>
+            <td>SparseML</td>
+            <td> 
+                <a href="https://github.com/neuralmagic/sparseml">
+                    <div style="text-align: center;">Github</div>
+                </a>
+            </td>
+            <td> </td>            
+            <td> </td>
         </tr>
         <tr>
             <td>BitsAndBytes</td>
@@ -179,6 +213,16 @@ jupyter notebook
             </td>
         </tr>
         <tr>
+            <td>SqueezeLLM</td>
+            <td> </td>
+            <td> </td>            
+            <td>
+                <a href="https://arxiv.org/pdf/2306.07629.pdf">
+                    <div style="text-align: center;">2306</div>
+                </a>
+            </td>
+        </tr>
+        <tr>
             <td>EXL2</td>
             <td>
                 <a href="https://github.com/turboderp/exllamav2">Github</a>
@@ -197,7 +241,7 @@ jupyter notebook
                 <a href="https://towardsdatascience.com/run-mixtral-8x7b-on-consumer-hardware-with-expert-offloading-bd3ada394688">HQQ for Mixtral</a>
             </td>
             <td></td>
-        </tr>
+        </tr>        
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
