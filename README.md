@@ -41,7 +41,7 @@ jupyter notebook
             <td style="font-size:20px">Method</td>
             <td style="font-size:20px">Documentation</td>
             <td style="font-size:20px">Examples</td>
-            <td style="font-size:20px">Paper</td>
+            <td style="font-size:20px">Comment</td>
         </tr>
         <tr>
             <td>Huggingface transformers</td>
@@ -53,7 +53,7 @@ jupyter notebook
             <td>ctransformers</td>
             <td><a href="https://github.com/marella/ctransformers">Github</a></td>
             <td> </td>
-            <td> </td>
+            <td>CPU-only, Unmaintained</td>
         </tr>
         <tr>
             <td>ollama</td>
@@ -86,25 +86,36 @@ jupyter notebook
             <td> </td>
         </tr>
         <tr>
-            <td>vLLM (service)</td>
+            <td>vLLM</td>
             <td>
                 <a href="https://github.com/vllm-project/vllm">Github</a>,
-                <a href="https://www.anyscale.com/blog/continuous-batching-llm-inference">Inference speed blog post</a>
+                <a href="https://www.anyscale.com/blog/continuous-batching-llm-inference">Inference speed blog post</a>,
+                <a href="https://arxiv.org/pdf/2309.06180.pdf">Article</a>
             </td>
             <td>
                 <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a>, 
-                <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>
+                <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>,
+                <a href="https://betterprogramming.pub/superfast-llm-text-generation-with-vllm-on-windows-11-4a6617d4e0b3">Run in WSL</a>
             </td>
-            <td><a href="https://arxiv.org/pdf/2309.06180.pdf">2309</a></td>
+            <td>Service, Linux-only</td>
         </tr>
         <tr>
-            <td>LangChain (framework)</td>
+            <td>TGI: Text Generation Inference</td>
+            <td>
+                <a href="https://github.com/huggingface/text-generation-inference">Github</a>
+                <a href="https://huggingface.co/docs/text-generation-inference/index">HF page</a>
+            </td>
             <td> </td>
-            <td> </td>
-            <td> </td>
+            <td>Service</td>
         </tr>
         <tr>
-            <td>Llama-index (framework)</td>
+            <td>LangChain</td>
+            <td> </td>
+            <td> </td>
+            <td>Framework</td>
+        </tr>
+        <tr>
+            <td>Llama-index</td>
             <td>
                 <a href="https://github.com/run-llama/llama_index">Github</a>,
                 <a href="https://docs.llamaindex.ai/en/stable/">Documentation</a>
@@ -112,7 +123,7 @@ jupyter notebook
             <td>
                 <a href="https://github.com/run-llama/llama_index/tree/main/docs/examples/llm">Official list of notebooks</a>
             </td>
-            <td> </td>
+            <td>Framework</td>
         </tr>
         <tr>
             <td>EmbedChain</td>

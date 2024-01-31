@@ -108,3 +108,11 @@ resp.json()
 ```
 
 # 3. TGI: Text Generation Inference
+
+```python
+
+```
+
+```python
+
+```
