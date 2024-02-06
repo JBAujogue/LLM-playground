@@ -105,7 +105,9 @@ jupyter notebook
                 <a href="https://github.com/huggingface/text-generation-inference">Github</a>
                 <a href="https://huggingface.co/docs/text-generation-inference/index">HF page</a>
             </td>
-            <td> </td>
+            <td> 
+                <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>
+            </td>
             <td>Service</td>
         </tr>
         <tr>

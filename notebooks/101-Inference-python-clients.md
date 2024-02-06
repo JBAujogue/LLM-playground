@@ -40,13 +40,6 @@ device_int, device
 ### Global variables
 
 ```python
-model_id = 'TheBloke/zephyr-7B-beta-GPTQ'
-model_id_gguf = 'TheBloke/zephyr-7B-beta-GGUF'
-
-# model_id = 'TheBloke/openchat-3.5-0106-GPTQ'
-```
-
-```python
 system = '''
     Answer the question based on the context below. Keep your answer short. 
     Only use information mentioned in context to form your answer.
@@ -64,13 +57,39 @@ query_list = [
     "Comment tu t'appelle ?",
     'What is the best year of all time ?',
 ]
+```
 
-chat_messages = [[
+```python
+# --------- zephyr -------------
+zephyr_model_id = 'TheBloke/zephyr-7B-beta-GPTQ'
+zephyr_model_id_gguf = 'TheBloke/zephyr-7B-beta-GGUF'
+zephyr_chat_messages = [[
         dict(role = "system", content = f'{system}\n{context}'),
         dict(role = "user", content = query),
     ]
     for context, query in zip(context_list, query_list)
 ]
+```
+
+```python
+# model_id = 'TheBloke/openchat-3.5-0106-GPTQ'
+```
+
+```python
+# --------- mistral instruct -------------
+mistral_instruct_model_id = 'TheBloke/Mistral-7B-Instruct-v0.2-GPTQ'
+mistral_instruct_chat_messages = [[
+        dict(role = "user", content = f'{system}\n{context}\n\n\n{query}'),
+    ]
+    for context, query in zip(context_list, query_list)
+]
+```
+
+Pick up a choice here:
+
+```python
+model_id = mistral_instruct_model_id
+chat_messages = mistral_instruct_chat_messages
 ```
 
 # 1. Huggingface `transformers`
@@ -86,11 +105,7 @@ from transformers import pipeline, TextStreamer
 ```
 
 ```python
-pipeline_config = dict(
-    task = 'text-generation', 
-    model = model_id, 
-    device_map = device,
-)
+pipeline_config = dict(task = 'text-generation', model = model_id, device_map = device)
 
 llm = pipeline(**pipeline_config)
 ```
