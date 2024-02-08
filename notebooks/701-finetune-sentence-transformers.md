@@ -30,39 +30,29 @@ import re
 from pathlib import Path
 
 from datasets import load_dataset, load_from_disk, DatasetDict
-from llama_index import Document
-from llama_index.finetuning import EmbeddingQAFinetuneDataset, SentenceTransformersFinetuneEngine
-
-from sentence_transformers import SentenceTransformer
+from llama_index.finetuning import EmbeddingQAFinetuneDataset
 ```
 
 ```python
 path_to_repo = Path(os.getcwd()).parent
-path_to_data = os.path.join(path_to_repo, 'data', 'code-python')
-path_to_logs = os.path.join(path_to_repo, 'experiments', 'logs')
-path_to_models = os.path.join(path_to_repo, 'experiments', 'models')
+path_to_data = os.path.join(path_to_repo, 'data')
+path_to_runs = os.path.join(path_to_repo, 'mlruns')
 ```
 
 ### Global variables
 
 ```python
+# input
+dataset_folder = 'code-python'
 dataset_name = 'iamtarun--python_code_instructions_18k_alpaca'
 input_model_name = 'sentence-transformers/all-mpnet-base-v2'
-output_model_name = f'{input_model_name}@{dataset_name}'.replace('/', '--')
 ```
 
 ```python
-path_to_exp = os.path.join(path_to_logs, output_model_name)
+# output
+output_model_name = f'{input_model_name}@{dataset_folder}'.replace('/', '--')
 
-os.makedirs(path_to_exp, exist_ok = True)
-
-run_list = [0] + [
-    int(n)
-    for f in os.listdir(path_to_exp) 
-    if os.path.isdir(os.path.join(path_to_exp, f))
-    for n in re.findall(r'^run(\d+)$', f)
-]
-path_to_run = os.path.join(path_to_exp, f'run{max(run_list)+1}')
+path_to_exp = os.path.join(path_to_runs, output_model_name)
 ```
 
 # 1. Prepare dataset
@@ -78,7 +68,7 @@ def convert_hf_to_llamaindex_dataset(dataset):
 
 ```python
 # load dataset from disk
-dataset = load_from_disk(os.path.join(path_to_data, dataset_name))
+dataset = load_from_disk(os.path.join(path_to_data, dataset_folder, dataset_name))
 dataset = dataset['train']
 
 # split into train / valid / test
@@ -95,38 +85,146 @@ dataset_dict = dict(
 
 # 2. Finetune model
 
-Remark: The llama-index `SentenceTransformersFinetuneEngine` [source code](https://github.com/run-llama/llama_index/blob/main/llama_index/finetuning/embeddings/sentence_transformer.py) is easily extractible into a standalone trainer class.
+The llama-index `SentenceTransformersFinetuneEngine` [source code](https://github.com/run-llama/llama_index/blob/main/llama_index/finetuning/embeddings/sentence_transformer.py) is easily extractible into a standalone trainer class:
 
 ```python
-training_config = dict(
-    batch_size = 6,
-    epochs = 1,
-    evaluation_steps = 50,
+# from llama_index.finetuning import SentenceTransformersFinetuneEngine
+```
+
+```python
+"""
+Sentence Transformer Trainer.
+Adapted from
+    https://github.com/run-llama/llama_index/blob/main/llama_index/finetuning/embeddings/sentence_transformer.py
+"""
+
+from typing import Dict, Any, Optional
+
+
+class SentenceTransformersTrainer:
+    """
+    Sentence Transformers Trainer.
+    """
+    def __init__(
+        self,
+        model_name_or_path: str,
+        logging_dir: str,
+        train_dataset: Any,
+        valid_dataset: Optional[Any] = None,
+        batch_size: int = 8,
+        training_args: Optional[Dict[str, Any]] = {},
+        ):
+        """
+        Init params.
+        training_args are listed in 
+            https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py
+        """
+        import os
+        import re
+        from torch.utils.data import DataLoader
+        from sentence_transformers import InputExample, SentenceTransformer, losses
+        from sentence_transformers.evaluation import InformationRetrievalEvaluator
+
+        # set output path
+        os.makedirs(logging_dir, exist_ok = True)
+        run_list = [0] + [
+            int(n)
+            for f in os.listdir(logging_dir) 
+            if os.path.isdir(os.path.join(path_to_exp, f))
+            for n in re.findall(r'^run(\d+)$', f)
+        ]
+        self.output_path = os.path.join(logging_dir, f'run{max(run_list)+1}')
+
+        # set model
+        self.model = SentenceTransformer(model_name_or_path, device = 'cuda')
+
+        # set dataloader
+        self.examples = [
+            InputExample(texts = [query, train_dataset.corpus[text_id]])
+            for query_id, query in train_dataset.queries.items()
+            for text_id in train_dataset.relevant_docs[query_id]
+        ]
+        self.loader = DataLoader(self.examples, batch_size = batch_size)
+
+        # set loss
+        self.loss = losses.MultipleNegativesRankingLoss(self.model)
+        
+        # set evaluator
+        evaluator: Optional[InformationRetrievalEvaluator] = None
+        if valid_dataset is not None:
+            evaluator = InformationRetrievalEvaluator(
+                valid_dataset.queries, valid_dataset.corpus, valid_dataset.relevant_docs,
+            )
+        self.evaluator = evaluator
+
+        # set default training arguments
+        training_args |= dict(
+            train_objectives = [(self.loader, self.loss)],
+            evaluator = self.evaluator,
+            output_path = self.output_path,
+        )
+        self.training_args = training_args
+
+    def train(self):
+        self.model.fit(**self.training_args)
+
+    def evaluate(self, dataset: Any, output_path: str):
+        evaluator = InformationRetrievalEvaluator(
+            dataset.queries, dataset.corpus, dataset.relevant_docs,
+        )
+        return evaluator(self.model, output_path = output_path)
+```
+
+We may use sentence-transformers's [callback](https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py#L917) arg to write validation scores to a tensorboard log file, see pytorch's [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) doc
+
+```python
+# from torch.utils.tensorboard import SummaryWriter
+```
+
+```python
+training_args = dict(
+    epochs = 2,
+    steps_per_epoch = None,
+    scheduler = "WarmupLinear",
+    warmup_steps = 100,
+    optimizer_params = {"lr": 2e-5},
+    weight_decay = 1e-3,
+    evaluation_steps = 200,
+    save_best_model = False,
+    max_grad_norm = 1,
+    use_amp = False,
+    callback = None,
+    show_progress_bar = True,
+    checkpoint_path = None,
+    checkpoint_save_steps = 0,
+    checkpoint_save_total_limit = 0,
 )
 ```
 
 ```python
-trainer = SentenceTransformersFinetuneEngine(
-    dataset = dataset_dict['train'],
-    val_dataset = dataset_dict['valid'],
-    model_id = input_model_name,
-    model_output_path = os.path.join(path_to_run, 'model'),
-    **training_config,
+trainer = SentenceTransformersTrainer(
+    model_name_or_path = input_model_name,
+    logging_dir = path_to_exp,
+    train_dataset = dataset_dict['train'],
+    valid_dataset = dataset_dict['valid'],
+    batch_size = 6,
+    training_args = training_args,
 )
+```
 
-trainer.finetune()
+```python
+trainer.train()
 ```
 
 # 3. Evaluate model
 
+
+
 ```python
-from torch.utils.tensorboard import SummaryWriter
+
 ```
 
 ```python
-#writer = SummaryWriter(log_dir = )
-```
-
-```python
-help(SummaryWriter)
+out_path = trainer.training_args['output_path']
+out_path
 ```
