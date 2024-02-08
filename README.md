@@ -111,6 +111,15 @@ jupyter notebook
             <td>Service</td>
         </tr>
         <tr>
+            <td>Triton Inference Server</td>
+            <td>
+                <a href="https://github.com/triton-inference-server/pytriton/tree/main">Github</a>
+                <a href="https://github.com/triton-inference-server/pytriton/tree/main">pytriton Github</a>
+            </td>
+            <td> </td>
+            <td>Service</td>
+        </tr>
+        <tr>
             <td>LangChain</td>
             <td> </td>
             <td> </td>
