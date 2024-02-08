@@ -152,7 +152,8 @@ jupyter notebook
             <td colspan=4;>
                 <a href="https://docs.llamaindex.ai/en/stable/module_guides/models/llms.html#modules">List of LLM frameworks</a>,
                 <a href="https://github.com/aws-samples/amazon-sagemaker-generativeai">AWS GenAI tutorials</a>,
-                <a href="https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard">Open LLM Huggingface leaderboard</a>
+                <a href="https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard">Open LLM Huggingface leaderboard</a>,
+                <a href="https://github.com/hamelsmu/llama-inference">hamelsmu llama-inference</a>,
             </td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
