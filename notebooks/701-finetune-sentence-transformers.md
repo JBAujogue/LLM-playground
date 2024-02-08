@@ -67,6 +67,59 @@ def convert_hf_to_llamaindex_dataset(dataset):
 ```
 
 ```python
+from datasets import Dataset
+
+dataset = Dataset.from_dict({
+    "instruction": [
+        "write me a message", 
+        "give me a cover letter",
+        "write me a love letter",
+        'lol',
+        'give me a joke',
+        'I like cakes',
+        'bigO',
+        'some text',
+        "write me a message", 
+        "give me a cover letter",
+        "write me a love letter",
+        'lol',
+        'give me a joke',
+        'I like cakes',
+        'bigO',
+        'some text',
+    ], 
+    "output": [
+        'some answer', 
+        'some funny story',
+        'hey',
+        "cover letter",
+        "some message",
+        "love letter",
+        'lol',
+        'some cake recipe',
+        'some answer', 
+        'some funny story',
+        'hey',
+        "cover letter",
+        "some message",
+        "love letter",
+        'lol',
+        'some cake recipe',
+    ]})
+
+# split into train / valid / test
+dataset_train_else = dataset.train_test_split(test_size = .2, seed = 42, shuffle = False)
+dataset_valid_test = dataset_train_else['test'].train_test_split(test_size = .5, seed = 42, shuffle = False)
+
+# convert to dict of llama_index datasets
+dataset_dict = dict(
+    train = convert_hf_to_llamaindex_dataset(dataset_train_else['train']),
+    valid = convert_hf_to_llamaindex_dataset(dataset_valid_test['train']),
+    test = convert_hf_to_llamaindex_dataset(dataset_valid_test['test']),
+)
+```
+
+```python
 # load dataset from disk
 dataset = load_from_disk(os.path.join(path_to_data, dataset_folder, dataset_name))
 dataset = dataset['train']
@@ -85,7 +138,9 @@ dataset_dict = dict(
 
 # 2. Finetune model
 
-The llama-index `SentenceTransformersFinetuneEngine` [source code](https://github.com/run-llama/llama_index/blob/main/llama_index/finetuning/embeddings/sentence_transformer.py) is easily extractible into a standalone trainer class:
+The llama-index `SentenceTransformersFinetuneEngine` [source code](https://github.com/run-llama/llama_index/blob/main/llama_index/finetuning/embeddings/sentence_transformer.py) is easily extractible into a standalone trainer class.
+
+We considered using sentence-transformers's [callback](https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py#L917) arg to write validation scores to a tensorboard log file, inspired by transformers tensorboard [callback](https://github.com/huggingface/transformers/blob/v4.37.2/src/transformers/integrations/integration_utils.py#L579) function. However the callback function is called over the evaluator's output, see [here](https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/evaluation/InformationRetrievalEvaluator.py#L144), which is only a global score and not the fine-grained, per-metric scores.
 
 ```python
 # from llama_index.finetuning import SentenceTransformersFinetuneEngine
@@ -99,6 +154,17 @@ Adapted from
 """
 
 from typing import Dict, Any, Optional
+import logging
+
+import os
+import re
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+from sentence_transformers import InputExample, SentenceTransformer, losses
+from sentence_transformers.evaluation import InformationRetrievalEvaluator
+
+
+logger = logging.getLogger(__name__)
 
 
 class SentenceTransformersTrainer:
@@ -108,6 +174,7 @@ class SentenceTransformersTrainer:
     def __init__(
         self,
         model_name_or_path: str,
+        device: str,
         logging_dir: str,
         train_dataset: Any,
         valid_dataset: Optional[Any] = None,
@@ -119,11 +186,6 @@ class SentenceTransformersTrainer:
         training_args are listed in 
             https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py
         """
-        import os
-        import re
-        from torch.utils.data import DataLoader
-        from sentence_transformers import InputExample, SentenceTransformer, losses
-        from sentence_transformers.evaluation import InformationRetrievalEvaluator
 
         # set output path
         os.makedirs(logging_dir, exist_ok = True)
@@ -136,7 +198,7 @@ class SentenceTransformersTrainer:
         self.output_path = os.path.join(logging_dir, f'run{max(run_list)+1}')
 
         # set model
-        self.model = SentenceTransformer(model_name_or_path, device = 'cuda')
+        self.model = SentenceTransformer(model_name_or_path, device = device)
 
         # set dataloader
         self.examples = [
@@ -157,6 +219,9 @@ class SentenceTransformersTrainer:
             )
         self.evaluator = evaluator
 
+        # set tensorboard summary writer
+        self._SummaryWriter = SummaryWriter
+
         # set default training arguments
         training_args |= dict(
             train_objectives = [(self.loader, self.loss)],
@@ -167,18 +232,50 @@ class SentenceTransformersTrainer:
 
     def train(self):
         self.model.fit(**self.training_args)
+        self.send_logs_to_tensorboard('eval')
+        return
 
-    def evaluate(self, dataset: Any, output_path: str):
+    def evaluate(self, dataset: Any, metric_key_prefix: str = 'test', output_path: Optional[str] = None):
         evaluator = InformationRetrievalEvaluator(
             dataset.queries, dataset.corpus, dataset.relevant_docs,
         )
-        return evaluator(self.model, output_path = output_path)
-```
+        out_path = (output_path or self.output_path)
+        score = evaluator(self.model, output_path = out_path)
+        self.send_logs_to_tensorboard(metric_key_prefix, output_path = out_path)
+        return score
 
-We may use sentence-transformers's [callback](https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py#L917) arg to write validation scores to a tensorboard log file, see pytorch's [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) doc
+    def send_logs_to_tensorboard(self, metric_key_prefix: str, output_path: Optional[str] = None):
+        import pandas as pd
 
-```python
-# from torch.utils.tensorboard import SummaryWriter
+        self.tb_writer = self._SummaryWriter(log_dir = self.output_path)
+        
+        # set path to logs 
+        # TODO: try to infer it from self attributes
+        logs_filepath = os.path.join(
+            (output_path or self.output_path), 
+            (metric_key_prefix if metric_key_prefix == 'eval' else ''), 
+            'Information-Retrieval_evaluation_results.csv',
+        )
+        if os.path.isfile(logs_filepath):
+            # parse sentence-transformers scores
+            tb_scores = pd.read_csv(logs_filepath).to_dict('records')
+    
+            # write scores to tensorboard log file
+            for scores in tb_scores:
+                epoch, step = scores['epoch'], scores['steps']
+                for k, v in scores.items():
+                    if isinstance(v, (int, float)):
+                        self.tb_writer.add_scalar(f'{metric_key_prefix}/{k}', v, (epoch + 1) * step)
+                    else:
+                        logger.warning(
+                            "Trainer is attempting to log a value of "
+                            f'"{v}" of type {type(v)} for key "{k}" as a scalar. '
+                            "This invocation of Tensorboard's writer.add_scalar() "
+                            "is incorrect so we dropped this attribute."
+                        )
+                self.tb_writer.flush()
+        self.tb_writer.close()
+        return
 ```
 
 ```python
@@ -189,7 +286,7 @@ training_args = dict(
     warmup_steps = 100,
     optimizer_params = {"lr": 2e-5},
     weight_decay = 1e-3,
-    evaluation_steps = 200,
+    evaluation_steps = 2,
     save_best_model = False,
     max_grad_norm = 1,
     use_amp = False,
@@ -204,27 +301,29 @@ training_args = dict(
 ```python
 trainer = SentenceTransformersTrainer(
     model_name_or_path = input_model_name,
+    device = 'cpu',
     logging_dir = path_to_exp,
     train_dataset = dataset_dict['train'],
     valid_dataset = dataset_dict['valid'],
-    batch_size = 6,
+    batch_size = 1,
     training_args = training_args,
 )
 ```
+
+### Evaluate model prior training
+
+```python
+trainer.evaluate(dataset_dict['test'], metric_key_prefix = 'base')
+```
+
+### Train model
 
 ```python
 trainer.train()
 ```
 
-# 3. Evaluate model
-
-
+### Evaluate model post training
 
 ```python
-
-```
-
-```python
-out_path = trainer.training_args['output_path']
-out_path
+trainer.evaluate(dataset_dict['test'])
 ```
