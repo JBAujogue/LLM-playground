@@ -46,7 +46,7 @@ class SentenceTransformersTrainer:
         run_list = [0] + [
             int(n)
             for f in os.listdir(logging_dir) 
-            if os.path.isdir(os.path.join(path_to_exp, f))
+            if os.path.isdir(os.path.join(logging_dir, f))
             for n in re.findall(r'^run(\d+)$', f)
         ]
         self.output_path = os.path.join(logging_dir, f'run{max(run_list)+1}')
@@ -110,26 +110,28 @@ class SentenceTransformersTrainer:
         return
 
     def send_logs_to_tensorboard(self, metric_key_prefix: str, output_path: Optional[str] = None):
-        self.tb_writer = self._SummaryWriter(log_dir = self.output_path)
+        log_dir = (output_path or self.output_path)
+        self.tb_writer = self._SummaryWriter(log_dir = log_dir)
         
         # set path to logs 
         # TODO: try to infer it from self attributes
-        logs_filepath = os.path.join(
-            (output_path or self.output_path), 
+        log_filepath = os.path.join(
+            log_dir, 
             (metric_key_prefix if metric_key_prefix == 'eval' else ''), 
             'Information-Retrieval_evaluation_results.csv',
         )
-        if os.path.isfile(logs_filepath):
+        if os.path.isfile(log_filepath):
             # parse sentence-transformers scores
-            tb_scores = pd.read_csv(logs_filepath).to_dict('records')
+            tb_scores = pd.read_csv(log_filepath).to_dict('records')
     
             # write scores to tensorboard log file
+            max_steps = max(scores['steps'] for scores in tb_scores)
             for scores in tb_scores:
                 epoch, step = scores['epoch'], scores['steps']
                 if step != -1:
                     for k, v in scores.items():
                         if isinstance(v, (int, float)):
-                            self.tb_writer.add_scalar(f'{metric_key_prefix}/{k}', v, (epoch + 1) * step)
+                            self.tb_writer.add_scalar(f'{metric_key_prefix}/{k}', v, epoch * max_steps + step)
                         else:
                             logger.warning(
                                 "Trainer is attempting to log a value of "
