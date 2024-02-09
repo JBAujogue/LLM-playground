@@ -73,7 +73,7 @@ class SentenceTransformersTrainer:
             )
         self.evaluator = evaluator
 
-        # set tensorboard summary writer
+        # set tensorboard log writer
         self._SummaryWriter = SummaryWriter
 
         # set default training arguments
