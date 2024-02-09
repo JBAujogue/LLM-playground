@@ -111,7 +111,7 @@ class SentenceTransformersTrainer:
 
     def send_logs_to_tensorboard(self, metric_key_prefix: str, output_path: Optional[str] = None):
         log_dir = (output_path or self.output_path)
-        self.tb_writer = self._SummaryWriter(log_dir = log_dir)
+        tb_writer = self._SummaryWriter(log_dir = log_dir)
         
         # set path to logs 
         # TODO: try to infer it from self attributes
@@ -131,7 +131,7 @@ class SentenceTransformersTrainer:
                 if step != -1:
                     for k, v in scores.items():
                         if isinstance(v, (int, float)):
-                            self.tb_writer.add_scalar(f'{metric_key_prefix}/{k}', v, epoch * max_steps + step)
+                            tb_writer.add_scalar(f'{metric_key_prefix}/{k}', v, epoch * max_steps + step)
                         else:
                             logger.warning(
                                 "Trainer is attempting to log a value of "
@@ -139,6 +139,6 @@ class SentenceTransformersTrainer:
                                 "This invocation of Tensorboard's writer.add_scalar() "
                                 "is incorrect so we dropped this attribute."
                             )
-                    self.tb_writer.flush()
-        self.tb_writer.close()
+                    tb_writer.flush()
+        tb_writer.close()
         return
