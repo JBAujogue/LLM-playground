@@ -109,10 +109,64 @@ resp.json()
 
 # 3. TGI: Text Generation Inference
 
+## 3.1 Simple wrapper around TGI backend service
+
 ```python
 
 ```
 
 ```python
 
+```
+
+## 3.2 Langchain wrapper around TGI backend service
+
+See the [langchain community official doc](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference).
+
+```python
+# see https://github.com/docker/docker-py
+import docker
+client = docker.from_env()
+```
+
+```python
+image = 'ghcr.io/huggingface/text-generation-inference:1.4'
+volumes = ['./checkpoints:/checkpoints']
+
+client.containers.run(image, volumes = volumes)
+```
+
+```python
+help(client.containers.run)
+```
+
+```python
+# Basic Example (no streaming)
+llm = HuggingFaceTextGenInference(
+    inference_server_url="http://localhost:8010/",
+    max_new_tokens=512,
+    top_k=10,
+    top_p=0.95,
+    typical_p=0.95,
+    temperature=0.01,
+    repetition_penalty=1.03,
+)
+print(llm("What is Deep Learning?"))
+
+# Streaming response example
+from langchain_community.callbacks import streaming_stdout
+
+callbacks = [streaming_stdout.StreamingStdOutCallbackHandler()]
+llm = HuggingFaceTextGenInference(
+    inference_server_url="http://localhost:8010/",
+    max_new_tokens=512,
+    top_k=10,
+    top_p=0.95,
+    typical_p=0.95,
+    temperature=0.01,
+    repetition_penalty=1.03,
+    callbacks=callbacks,
+    streaming=True
+)
+print(llm("What is Deep Learning?"))
 ```

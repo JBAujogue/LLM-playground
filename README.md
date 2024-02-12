@@ -3,7 +3,7 @@ This project contains experiments on GenAI.
 
 
 # Getting Started
-## Installation process
+## Local python setup
 This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
 1) Create a new conda environment with
 ```
@@ -23,6 +23,19 @@ poetry install
 4) Launch a jupyter server with
 ```
 jupyter notebook
+```
+
+## Docker & WSL
+This project was developed on a Windows 11 os, while some components require a linux os and are thus running inside a containerized environment backed by WSL.
+
+1) Install WSL and a Linux distribution following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install).
+
+2) Install [Docker](https://docs.docker.com/desktop/install/windows-install/) or [Podman]().
+
+Terminate the running linux kernel:
+```
+(kill one kernel) wsl -t <distro-name>
+(kill all kernel) wsl --shutdown
 ```
 
 # Learning plan
