@@ -81,22 +81,10 @@ Terminate the running linux kernel:
             <td> </td>
         </tr>
         <tr>
-            <td>PrivateGPT</td>
-            <td><a href="https://github.com/imartinez/privateGPT">Github</a></td>
-            <td> </td>
-            <td> </td>
-        </tr>
-        <tr>
             <td>DeepSparse</td>
             <td><a href="https://github.com/neuralmagic/deepsparse">Github</a></td>
             <td> </td>
-            <td> </td>
-        </tr>
-        <tr>
-            <td>Llama-cpp-python</td>
-            <td><a href="https://github.com/abetlen/llama-cpp-python">Github</a></td>
-            <td> </td>
-            <td> </td>
+            <td>Service, Linux-only</td>
         </tr>
         <tr>
             <td>vLLM</td>
