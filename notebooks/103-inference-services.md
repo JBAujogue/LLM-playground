@@ -60,10 +60,14 @@ chat_messages = [[
 
 # 1. Simple FastAPI service
 
-Run the service with :
+
+Open a CLI at the root of the project, and run the service with :
 ```
 uvicorn scripts.services.simple-llm-fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
 ```
+
+
+## 1.1 Direct requests to FastAPI service
 
 ```python
 url = 'http://localhost:8000/predict'
@@ -93,6 +97,20 @@ resp.status_code
 resp.json()
 ```
 
+## 1.2 Huggingface client around FastAPI service
+
+```python
+from huggingface_hub import InferenceClient
+```
+
+```python
+InferenceClient
+```
+
+```python
+
+```
+
 ```python
 
 ```
@@ -107,19 +125,24 @@ resp.json()
 
 ```
 
-# 3. TGI: Text Generation Inference
+# 3. Huggingface Text Generation Inference (TGI)
 
-## 3.1 Simple wrapper around TGI backend service
 
-```python
-
-```
+## 3.1 Simple client around TGI service
 
 ```python
 
 ```
 
-## 3.2 Langchain wrapper around TGI backend service
+## 3.2 Huggingface client around TGI service
+
+See [Huggingface's official python client](https://github.com/huggingface/text-generation-inference/tree/main/clients/python) around TGI services.
+
+```python
+
+```
+
+## 3.3 Langchain client around TGI service
 
 See the [langchain community official doc](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference).
 
