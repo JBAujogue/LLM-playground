@@ -111,7 +111,8 @@ Terminate the running linux kernel:
                 <a href="https://betterprogramming.pub/superfast-llm-text-generation-with-vllm-on-windows-11-4a6617d4e0b3">Run in WSL</a>
             </td>
             <td><p>Service</p>
-                <p>Linux-only</p></td>
+                <p>Linux-only</p>
+            </td>
         </tr>
         <tr>
             <td>TGI: Text Generation Inference</td>
@@ -123,8 +124,10 @@ Terminate the running linux kernel:
                 <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>
             </td>
             <td>
-                <p>Service</p>
-                <p>Linux-only</p>
+                <p>
+                Service,
+                Linux-only
+                </p>
             </td>
         </tr>
         <tr>
