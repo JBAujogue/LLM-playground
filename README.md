@@ -84,7 +84,7 @@ Terminate the running linux kernel:
             <td>DeepSparse</td>
             <td><a href="https://github.com/neuralmagic/deepsparse">Github</a></td>
             <td> </td>
-            <td>Service, Linux-only</td>
+            <td>Service, CPU-only, Linux-only</td>
         </tr>
         <tr>
             <td>vLLM</td>
