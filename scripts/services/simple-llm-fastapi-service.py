@@ -4,6 +4,9 @@ Created Date: 2022/01/21
 Description : Wrapper converting a LLM into a FastAPI app object.
 References  :
     - https://luis-sena.medium.com/how-to-optimize-fastapi-for-ml-model-serving-6f75fb9e040d
+    - https://blog.stackademic.com/streaming-llm-responses-using-fastapi-deb575554397
+    - https://blog.stackademic.com/streaming-responses-from-llm-using-langchain-fastapi-329f588d3b40
+    
 Run it with :
 ```
 uvicorn scripts.services.simple-llm-fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
@@ -78,7 +81,7 @@ def create_service(llm):
     return app
 
 
-
+# GPU
 app = create_service(
     pipeline(
         task = 'text-generation', 
@@ -86,4 +89,5 @@ app = create_service(
         device_map = torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
     )
 )
+
 
