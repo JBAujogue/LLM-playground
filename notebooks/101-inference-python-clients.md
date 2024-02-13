@@ -60,10 +60,10 @@ query_list = [
 ```
 
 ```python
-# --------- zephyr -------------
-zephyr_model_id = 'TheBloke/zephyr-7B-beta-GPTQ'
-zephyr_model_id_gguf = 'TheBloke/zephyr-7B-beta-GGUF'
-zephyr_chat_messages = [[
+# --------- zephyr 7B -------------
+zephyr7b_model_id = 'TheBloke/zephyr-7B-beta-GPTQ'
+zephyr7b_model_id_gguf = 'TheBloke/zephyr-7B-beta-GGUF'
+zephyr7b_chat_messages = [[
         dict(role = "system", content = f'{system}\n{context}'),
         dict(role = "user", content = query),
     ]
@@ -85,11 +85,21 @@ mistral_instruct_chat_messages = [[
 ]
 ```
 
+```python
+# --------- zephyr 3B -------------
+zephyr3b_model_id = 'stabilityai/stablelm-zephyr-3b'
+zephyr3b_chat_messages = [[
+        dict(role = "user", content = query),
+    ]
+    for context, query in zip(context_list, query_list)
+]
+```
+
 Pick up a choice here:
 
 ```python
-model_id = mistral_instruct_model_id
-chat_messages = mistral_instruct_chat_messages
+model_id = zephyr3b_model_id
+chat_messages = zephyr3b_chat_messages
 ```
 
 # 1. Huggingface `transformers`
@@ -105,7 +115,12 @@ from transformers import pipeline, TextStreamer
 ```
 
 ```python
-pipeline_config = dict(task = 'text-generation', model = model_id, device_map = device)
+pipeline_config = dict(
+    task = 'text-generation', 
+    model = model_id, 
+    device_map = device,
+    trust_remote_code = True,
+)
 
 llm = pipeline(**pipeline_config)
 ```
@@ -153,6 +168,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 model_config = dict(
     pretrained_model_name_or_path = model_id, 
     device_map = device,
+    trust_remote_code = True,
 )
 
 tokenizer = AutoTokenizer.from_pretrained(**model_config)
@@ -182,8 +198,8 @@ generation_params = dict(
     repetition_penalty = 1.1,
 )
 
-tokens = tokenizer(messages, padding = True, truncation = True, return_tensors = 'pt').input_ids.cuda()
-tensors = model.generate(tokens, **generation_params)
+inputs = tokenizer(messages, padding = True, truncation = True, return_tensors = 'pt').input_ids
+tensors = model.generate(inputs.to(model.device), **generation_params)
 answers = tokenizer.batch_decode(tensors)
 ```
 
@@ -193,7 +209,7 @@ for a in answers:
     print('---')
 ```
 
-## 1.3 `ctransformers`
+# 2. `ctransformers`
 
 - `ctransformers` makes faster CPU inference speed compared to base `transformers`, but support is limited to base or GGUF-quantized models.
 - it also runs on GPU when installed with `ctransformers[cuda]` (although in this case it is best to go with `transformers` as it is not limited to GGUF quantization).
@@ -239,7 +255,9 @@ answers = llm(messages, **generation_params)
 ```
 
 <!-- #region -->
-## 1.4 `llama-index` wrapper
+# 3 `llama-index` 
+
+## 3.1 llama-index wrapper around Huggingface
 
 See `llama-index` [documentation](https://docs.llamaindex.ai/en/stable/module_guides/models/llms.html#using-llms) for instanciating models through its Huggingface wrapper.
 
@@ -316,7 +334,9 @@ for a in answers_complete:
     print('---')
 ```
 
-## 1.X `langchain` wrapper
+# 4. `langchain` 
+
+## 4.1 langchain wrapper around huggingface
 
 ```python
 from langchain.llms.huggingface_pipeline import HuggingFacePipeline
