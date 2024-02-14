@@ -529,7 +529,7 @@ Terminate the running linux kernel:
 ## Architectures
 
 
-| ![TGI-langchain-architecture](imgs\TGI-langchain-architecture.jpeg) | 
+| ![TGI-langchain-architecture](/imgs/TGI-langchain-architecture.jpeg) | 
 |:--:| 
 | *Architecture based on TGI and langchain proposed in this [blog post](https://www.ideas2it.com/blogs/deploying-llm-powered-applications-in-production-using-tgi)* |
 
