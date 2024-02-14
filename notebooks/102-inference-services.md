@@ -136,7 +136,7 @@ InferenceClient
 
 ## 3.2 Huggingface client around TGI service
 
-See [Huggingface's official python client](https://github.com/huggingface/text-generation-inference/tree/main/clients/python) around TGI services.
+See [Huggingface's official python client](https://github.com/huggingface/text-generation-inference/tree/main/clients/python) around TGI services, and [this example](https://towardsdatascience.com/llms-for-everyone-running-the-huggingface-text-generation-inference-in-google-colab-5adb3218a137).
 
 ```python
 
@@ -144,7 +144,7 @@ See [Huggingface's official python client](https://github.com/huggingface/text-g
 
 ## 3.3 Langchain client around TGI service
 
-See the [langchain community official doc](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference).
+See the [langchain community official doc](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference), and [this example](https://towardsdatascience.com/llms-for-everyone-running-the-huggingface-text-generation-inference-in-google-colab-5adb3218a137).
 
 ```python
 # see https://github.com/docker/docker-py

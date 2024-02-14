@@ -28,9 +28,9 @@ jupyter notebook
 ## Docker & WSL
 This project was developed on a Windows 11 os, while some components require a linux os and are thus running inside a containerized environment backed by WSL.
 
-1) Install WSL and a Linux distribution following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install).
+1) Install WSL and a Linux distro following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-2) Install [Docker](https://docs.docker.com/desktop/install/windows-install/) or [Podman]().
+2) Install [Docker](https://docs.docker.com/desktop/install/windows-install/) or [Podman]() on the Windows os.
 
 Terminate the running linux kernel:
 ```
@@ -526,13 +526,13 @@ Terminate the running linux kernel:
 </table>
 
 
-## Notables LLMs
-- OpenChat
-- OpenHermes
-- mistral-OpenOrca
-- zephyr-beta
-- mistral
-- llama2
+## Architectures
+
+
+| ![TGI-langchain-architecture](imgs\TGI-langchain-architecture.jpeg) | 
+|:--:| 
+| *Architecture based on TGI and langchain proposed in this [blog post](https://www.ideas2it.com/blogs/deploying-llm-powered-applications-in-production-using-tgi)* |
+
 
 
 
