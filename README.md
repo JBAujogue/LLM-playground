@@ -163,6 +163,7 @@ Terminate the running linux kernel:
                 <a href="https://docs.llamaindex.ai/en/stable/module_guides/models/llms.html#modules">List of LLM frameworks</a>,
                 <a href="https://github.com/aws-samples/amazon-sagemaker-generativeai">AWS GenAI tutorials</a>,
                 <a href="https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard">Open LLM Huggingface leaderboard</a>,
+                <a href="https://huggingface.co/spaces/mteb/leaderboard">MTEB leaderboard</a>,
                 <a href="https://github.com/hamelsmu/llama-inference">hamelsmu llama-inference</a>,
                 <a href="https://huggingface.co/spaces/mike-ravkine/can-ai-code-results">can-ai-code-results</a>,
             </td>
