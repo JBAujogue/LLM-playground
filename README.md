@@ -540,7 +540,7 @@ Terminate the running linux kernel:
 - [llm-course](https://github.com/mlabonne/llm-course/tree/main) Github repository
 - [langchain](https://github.com/langchain-ai/langchain/tree/master) Github repository
 - [llm-autoeval](https://github.com/mlabonne/llm-autoeval) Github repository
--[LLMs-from-scratch]()
+- [awesome-llms-fine-tuning](https://github.com/Curated-Awesome-Lists/awesome-llms-fine-tuning) Github repository
 
 
 
