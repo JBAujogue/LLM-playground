@@ -27,6 +27,7 @@ jupyter:
 import os, sys
 import time
 import requests
+import uvicorn
 ```
 
 ### Global variables
@@ -63,7 +64,7 @@ chat_messages = [[
 
 Open a CLI at the root of the project, and run the service with :
 ```
-uvicorn scripts.services.simple-llm-fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
+uvicorn scripts.services.fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
 ```
 
 
@@ -127,6 +128,9 @@ InferenceClient
 
 # 3. Huggingface Text Generation Inference (TGI)
 
+```python
+
+```
 
 ## 3.1 Simple client around TGI service
 

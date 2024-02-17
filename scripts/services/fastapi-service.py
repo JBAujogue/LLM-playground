@@ -7,9 +7,9 @@ References  :
     - https://blog.stackademic.com/streaming-llm-responses-using-fastapi-deb575554397
     - https://blog.stackademic.com/streaming-responses-from-llm-using-langchain-fastapi-329f588d3b40
     
-Run it with :
+Run it in the activated env with :
 ```
-uvicorn scripts.services.simple-llm-fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
+uvicorn scripts.services.fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
 ```
 """
 
