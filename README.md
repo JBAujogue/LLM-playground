@@ -41,8 +41,6 @@ Terminate the running linux kernel:
 # Learning plan
 
 
-
-
 <table style="height:100%; width:100%; text-align:center;">
     <thead>
         <tr>
@@ -107,7 +105,8 @@ Terminate the running linux kernel:
                 <a href="https://huggingface.co/docs/text-generation-inference/index">HF page</a>
             </td>
             <td> 
-                <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>
+                <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>,
+                <a href="https://kaitchup.substack.com/p/serve-large-language-models-from">Run again with WSL & Docker</a>
             </td>
             <td>Service, Linux-only</td>
         </tr>
@@ -277,7 +276,15 @@ Terminate the running linux kernel:
                 <a href="https://towardsdatascience.com/run-mixtral-8x7b-on-consumer-hardware-with-expert-offloading-bd3ada394688">HQQ for Mixtral</a>
             </td>
             <td></td>
-        </tr>        
+        </tr> 
+        <tr>
+            <td>EETQ</td>
+            <td>
+                <a href="https://github.com/NetEase-FuXi/EETQ">Github</a>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
