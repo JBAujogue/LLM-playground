@@ -151,7 +151,9 @@ See [Huggingface's official python client](https://github.com/huggingface/text-g
 See the [langchain community official doc](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference), and [this example](https://towardsdatascience.com/llms-for-everyone-running-the-huggingface-text-generation-inference-in-google-colab-5adb3218a137).
 
 ```python
-# see https://github.com/docker/docker-py
+# see:
+# - https://github.com/docker/docker-py
+# - https://docker-py.readthedocs.io/en/stable/containers.html
 import docker
 client = docker.from_env()
 ```

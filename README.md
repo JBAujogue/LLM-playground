@@ -3,7 +3,7 @@ This project contains experiments on GenAI.
 
 
 # Getting Started
-## Local python setup
+## Python setup
 This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
 1) Create a new conda environment with
 ```
@@ -25,18 +25,27 @@ poetry install
 jupyter notebook
 ```
 
-## Docker & WSL
+## WSL & Docker setup
 This project was developed on a Windows 11 os, while some components require a linux os and are thus running inside a containerized environment backed by WSL.
 
-1) Install WSL and a Linux distro following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install).
+1) Install WSL and create a linux distribution following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install). See also the [wsl basic commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands).
 
-2) Install [Docker](https://docs.docker.com/desktop/install/windows-install/) or [Podman]() on the Windows os.
+2) Install [Docker desktop](https://docs.docker.com/desktop/install/windows-install/) or [Podman]() on the Windows os. 
+    - **Note**: All previous versions of Docker Engine and CLI installed directly through Linux distributions must be uninstalled before installing Docker Desktop.
+    - Activate the WSL integration in Docker Desktop settings following [docker documentation](https://docs.docker.com/desktop/wsl/#turn-on-docker-desktop-wsl-2)
 
-Terminate the running linux kernel:
+3) Install `nvidia-container-toolkit` in your linux distro:
+    - Launch a linux terminal by running the `wsl` or `wsl --distribution <distro-name>` command in a cmd
+    - Execute the install commands found in [nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
+    - Allow docker to use nvidia Container Runtime by executing the commands found in [nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuration)
+
+4) Additional tips:
+    - Terminate the running linux kernel:
 ```
 (kill one kernel) wsl -t <distro-name>
 (kill all kernel) wsl --shutdown
 ```
+
 
 # Learning plan
 
@@ -106,7 +115,8 @@ Terminate the running linux kernel:
             </td>
             <td> 
                 <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>,
-                <a href="https://kaitchup.substack.com/p/serve-large-language-models-from">Run again with WSL & Docker</a>
+                <a href="https://kaitchup.substack.com/p/serve-large-language-models-from">Run again with WSL & Docker</a>,
+                <a href="https://vilsonrodrigues.medium.com/serving-falcon-models-with-text-generation-inference-tgi-5f32005c663b">External usage</a>
             </td>
             <td>Service, Linux-only</td>
         </tr>
