@@ -1,0 +1,31 @@
+
+- mistral-7b-instruct-v0.1-gguf-ctransformers-cpu:
+    model_config:
+      model_path_or_repo_id: TheBloke/Mistral-7B-Instruct-v0.1-GGUF
+      model_file: mistral-7b-instruct-v0.1.Q3_K_M.gguf
+      model_type: mistral
+
+    prompt_config:
+      template: '''<s>[INST] {user} [/INST]'''
+      input_variables:
+        - user
+
+    generation_config:
+      max_new_tokens: 128
+      stream: true
+
+
+- mistral-7b-instruct-v0.2-gguf-ctransformers-cpu:
+    model_config:
+      model_path_or_repo_id: TheBloke/Mistral-7B-Instruct-v0.2-GGUF
+      model_file: mistral-7b-instruct-v0.2.Q3_K_M.gguf
+      model_type: mistral
+
+    prompt_config:
+      template: '''<s>[INST] {user} [/INST]'''
+      input_variables:
+        - user
+
+    generation_config:
+      max_new_tokens: 128
+      stream: true
