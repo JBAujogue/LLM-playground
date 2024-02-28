@@ -1,0 +1,18 @@
+
+- mistral-7b-instruct-v0.2-gguf-langchain-ctransformers-cpu:
+    engine: langchain-ctransformers
+    model_config:
+      model: TheBloke/Mistral-7B-Instruct-v0.2-GGUF
+      model_file: mistral-7b-instruct-v0.2.Q3_K_M.gguf
+      streaming: true
+      config:
+        max_new_tokens: 64
+        seed: 42
+        top_p: 0.7
+
+    prompt_config:
+      template: '<s>[INST] {user} [/INST]'
+      input_variables:
+        - user
+      fields:
+
