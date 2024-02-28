@@ -35,6 +35,7 @@ async def callback(
         
         # set prompt config
         prompt_config = dict(model_args['prompt_config'])
+        prompt_config['fields'] = prompt_config['fields'] or dict()
         prompt_config['fields'] |= {'user': query}
         
         # set generation config
