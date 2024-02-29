@@ -6,6 +6,7 @@ Adapted from
 """
 
 from typing import List, Dict, Any, Optional
+from dataclasses import dataclass
 import logging
 
 import os
@@ -13,7 +14,6 @@ import re
 import pandas as pd
 
 from omegaconf import OmegaConf
-from pydantic.v1 import BaseModel
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from sentence_transformers import InputExample, SentenceTransformer, losses
@@ -23,7 +23,8 @@ from sentence_transformers.evaluation import InformationRetrievalEvaluator
 logger = logging.getLogger(__name__)
 
 
-class EmbeddingQAFinetuneDataset(BaseModel):
+@dataclass
+class EmbeddingQAFinetuneDataset:
     '''
     Embedding QA Finetuning Dataset.
 
@@ -32,8 +33,8 @@ class EmbeddingQAFinetuneDataset(BaseModel):
         corpus (Dict[str, str]): Dict id -> string.
         relevant_docs (Dict[str, List[str]]): Dict query id -> list of doc ids.
     '''
-    queries: Dict[str, str]  # dict id -> query
-    corpus: Dict[str, str]  # dict id -> string
+    queries: Dict[str, str]              # dict id -> query
+    corpus: Dict[str, str]               # dict id -> string
     relevant_docs: Dict[str, List[str]]  # query id -> list of doc ids
     mode: str = "text"
 
