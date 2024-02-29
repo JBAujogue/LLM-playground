@@ -163,7 +163,7 @@ class SentenceTransformersTrainer:
         '''
         out_path = model_path or os.path.join(self.run_dir, 'model')
         self.model.save(out_path)
-        return model_path
+        return out_path
 
     def send_logs_to_tensorboard(self, metric_key_prefix: str):
         '''
