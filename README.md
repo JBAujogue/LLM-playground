@@ -120,6 +120,7 @@ This project was developed on a Windows 11 os, while some components require a l
                 <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>,
                 <a href="https://kaitchup.substack.com/p/serve-large-language-models-from">Run again with WSL & Docker</a>,
                 <a href="https://vilsonrodrigues.medium.com/serving-falcon-models-with-text-generation-inference-tgi-5f32005c663b">External usage</a>
+                <a href="https://huggingface.co/blog/tgi-messages-api">Use with OpenAI / langchain / llama-index client</a>
             </td>
             <td>Service, Linux-only</td>
         </tr>
