@@ -562,6 +562,7 @@ This project was developed on a Windows 11 os, while some components require a l
 - [langchain](https://github.com/langchain-ai/langchain/tree/master) Github repository
 - [llm-autoeval](https://github.com/mlabonne/llm-autoeval) Github repository
 - [awesome-llms-fine-tuning](https://github.com/Curated-Awesome-Lists/awesome-llms-fine-tuning) Github repository
+- [cookbook](https://github.com/huggingface/cookbook/tree/main) Github repository
 
 
 
