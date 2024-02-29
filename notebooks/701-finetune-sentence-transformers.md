@@ -69,7 +69,7 @@ if path_to_src not in sys.path:
 ```
 
 ```python
-from llmtools.trainers.sentence_transformers_trainers import EmbeddingQAFinetuneDataset, SentenceTransformersTrainer
+from llmtools.train.sentence_transformers_trainers import EmbeddingQAFinetuneDataset, SentenceTransformersTrainer
 ```
 
 # 1. Prepare dataset
@@ -118,6 +118,11 @@ The llama-index `SentenceTransformersFinetuneEngine` [source code](https://githu
 
 We considered using sentence-transformers's [callback](https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py#L917) arg to write validation scores to a tensorboard log file, inspired by transformers tensorboard [callback](https://github.com/huggingface/transformers/blob/v4.37.2/src/transformers/integrations/integration_utils.py#L579) function. However the callback function is called over the evaluator's output, see [here](https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/evaluation/InformationRetrievalEvaluator.py#L144), which is only a global score and not the fine-grained, per-metric scores.
 
+After opening a conda interpreter, moving to the repo's root directory and activating the environment, Tensorboard can be run with the command
+```
+tensorboard --logdir=mlruns
+```
+
 ```python
 # model args and training args are listed in the sentence-transformers source code:
 # https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/SentenceTransformer.py
@@ -135,7 +140,7 @@ training_args = dict(
     warmup_steps = 10,
     optimizer_params = {'lr': 2e-5},
     weight_decay = 1e-3,
-    batch_size = 16,
+    batch_size = 4,
     evaluation_steps = 5,
     save_best_model = False,
     max_grad_norm = 1,
