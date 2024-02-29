@@ -6,24 +6,24 @@ This project contains experiments on GenAI.
 ## Python setup
 This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
 1) Create a new conda environment with
-```
-conda env create -f environment.yml
-```
+    ```
+    conda env create -f environment.yml
+    ```
 
 2) Activate the environment with
-```
-conda activate llm-playground
-```
+    ```
+    conda activate llm-playground
+    ```
 
 3) Move to the project directory, and install the project dependencies with
-```
-poetry install
-```
+    ```
+    poetry install
+    ```
 
 4) Launch a jupyter server with
-```
-jupyter notebook
-```
+    ```
+    jupyter notebook
+    ```
 
 ## WSL & Docker setup
 This project was developed on a Windows 11 os, while some components require a linux os and are thus running inside a containerized environment backed by WSL.
@@ -35,16 +35,19 @@ This project was developed on a Windows 11 os, while some components require a l
     - Activate the WSL integration in Docker Desktop settings following [docker documentation](https://docs.docker.com/desktop/wsl/#turn-on-docker-desktop-wsl-2)
 
 3) Install `nvidia-container-toolkit` in your linux distro:
-    - Launch a linux terminal by running the `wsl` or `wsl --distribution <distro-name>` command in a cmd
+    - Launch a linux terminal by running the following command in a cmd (the `--distribution` flag being optional)
+      ```
+      wsl --distribution <distro-name>
+      ```
     - Execute the install commands found in [nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
     - Allow docker to use nvidia Container Runtime by executing the commands found in [nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuration)
 
 4) Additional tips:
     - Terminate the running linux kernel:
-```
-(kill one kernel) wsl -t <distro-name>
-(kill all kernel) wsl --shutdown
-```
+      ```
+      (kill one kernel) wsl -t <distro-name>
+      (kill all kernel) wsl --shutdown
+      ```
 
 
 # Learning plan
