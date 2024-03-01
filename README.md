@@ -375,6 +375,16 @@ This project was developed on a Windows 11 os, while some components require a l
                 </a>
             </td>
         </tr>
+        <tr>
+            <td>Fill-In-The-Middle (FIM) transformation</td>
+            <td> </td>
+            <td> </td>
+            <td>
+                <a href="https://arxiv.org/pdf/2207.14255.pdf">
+                    <div style="text-align: center;">2207</div>
+                </a>
+            </td>
+        </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
