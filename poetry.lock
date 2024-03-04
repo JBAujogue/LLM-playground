@@ -6121,6 +6121,22 @@ test = ["pre-commit", "pytest (>=7.0)", "pytest-timeout"]
 typing = ["mypy (>=1.6,<2.0)", "traitlets (>=5.11.1)"]
 
 [[package]]
+name = "text-generation"
+version = "0.6.1"
+description = "Hugging Face Text Generation Python Client"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "text_generation-0.6.1-py3-none-any.whl", hash = "sha256:ebca00587eeabc0f5118f66ee1048bf690bd7735a9a10361c533c31c8c0bf994"},
+    {file = "text_generation-0.6.1.tar.gz", hash = "sha256:730e662aa7812f73c08ab953e008e90455f3d046f81efa0ef3de462bd4cf63d9"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.8,<4.0"
+huggingface-hub = ">=0.12,<1.0"
+pydantic = ">1.10,<3"
+
+[[package]]
 name = "texttable"
 version = "1.7.0"
 description = "module to create simple ASCII tables"
@@ -7308,4 +7324,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "7367df972db3563b86bf318323b69b41f40efdd6fbfce33c2d1e12dbb18e9f70"
+content-hash = "5a09ea25bf1f6d4ea91225c398a09799db107f82c695c9c7c1bc9cbcbc8d76c2"
