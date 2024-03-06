@@ -3,28 +3,6 @@ This project contains experiments on GenAI.
 
 
 # Getting Started
-## Python setup
-This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
-1) Create a new conda environment with
-    ```
-    conda env create -f environment.yml
-    ```
-
-2) Activate the environment with
-    ```
-    conda activate llm-playground
-    ```
-
-3) Move to the project directory, and install the project dependencies with
-    ```
-    poetry install
-    ```
-
-4) Launch a jupyter server with
-    ```
-    jupyter notebook
-    ```
-
 ## WSL & Docker setup
 This project was developed on a Windows 11 os, while some components require a linux os and are thus running inside a containerized environment backed by WSL.
 
@@ -48,6 +26,29 @@ This project was developed on a Windows 11 os, while some components require a l
       (kill one kernel) wsl -t <distro-name>
       (kill all kernel) wsl --shutdown
       ```
+
+## Python setup
+This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
+1) Install miniconda on windows or on [linux](https://dev.to/sfpear/miniconda-in-wsl-3642).
+2) Create a new conda environment with
+    ```
+    conda env create -f environment.yml
+    ```
+
+3) Activate the environment with
+    ```
+    conda activate llm-playground
+    ```
+
+4) Move to the project directory, and install the project dependencies with
+    ```
+    poetry install
+    ```
+
+5) Launch a jupyter server with
+    ```
+    jupyter notebook
+    ```
 
 
 # Learning plan
