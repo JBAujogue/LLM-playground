@@ -6,6 +6,10 @@ References  :
     - https://luis-sena.medium.com/how-to-optimize-fastapi-for-ml-model-serving-6f75fb9e040d
     - https://blog.stackademic.com/streaming-llm-responses-using-fastapi-deb575554397
     - https://blog.stackademic.com/streaming-responses-from-llm-using-langchain-fastapi-329f588d3b40
+
+To explore:
+    - https://blog.stackademic.com/streaming-llm-responses-using-fastapi-deb575554397
+    - https://pub.towardsai.net/serving-a-pytorch-model-with-fastapi-and-docker-cd234b2b0c05
     
 Run it in the activated env with :
 ```
