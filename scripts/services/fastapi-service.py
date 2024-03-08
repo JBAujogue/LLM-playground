@@ -10,6 +10,7 @@ References  :
 To explore:
     - https://blog.stackademic.com/streaming-llm-responses-using-fastapi-deb575554397
     - https://pub.towardsai.net/serving-a-pytorch-model-with-fastapi-and-docker-cd234b2b0c05
+    - https://medium.com/@mayvic/scalable-streaming-of-openai-model-responses-with-fastapi-and-asyncio-714744b13dd
     
 Run it in the activated env with :
 ```
