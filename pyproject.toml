@@ -40,6 +40,7 @@ mlflow = "^2.10.0"
 datasets = "^2.16.1"
 tensorboard = "^2.15.1"
 text-generation = "^0.6.1"
+chromadb = "^0.4.24"
 
 
 
