@@ -12,11 +12,9 @@ jupyter:
     name: python3
 ---
 
-<!-- #region -->
-
+# Backend LLM service using Text Generation Inference (TGI)
 
 ### Packages
-<!-- #endregion -->
 
 ```python
 %load_ext autoreload
@@ -27,7 +25,7 @@ jupyter:
 import os, sys
 import time
 import requests
-import uvicorn
+import docker
 
 # TGI
 from text_generation import InferenceAPIClient, InferenceAPIAsyncClient
@@ -69,101 +67,63 @@ chat_messages = [[
 ]
 ```
 
-# 1. Simple FastAPI service
+### Start backend service
 
 
-Open a CLI at the root of the project, and run the service with :
-```
-uvicorn scripts.services.fastapi-service:app --root-path . --host 0.0.0.0 --port 8000
-```
-
-
-## 1.1 Direct requests to FastAPI service
-
-```python
-url = 'http://localhost:8000/predict'
-
-generation_params = dict(
-    max_new_tokens = 128,
-    num_beams = 1,
-    batch_size = 1,
-    do_sample = True,
-    temperature = 0.7,
-    top_p = 0.95,
-    top_k = 40,
-    repetition_penalty = 1.1,
-)
-
-resp = requests.post(
-    url = url,
-    json = dict(
-        chat_messages = chat_messages,
-        generation_params = generation_params,
-    ),
-)
-resp.status_code
-```
-
-```python
-resp.json()
-```
-
-## 1.2 Huggingface-hub client around FastAPI service
-
-```python
-
-```
-
-# 2. Text Generation Inference (TGI)
-
-<!-- #region -->
 Run the backend service with one of the following methods:
 
-1. Start an existing container: open Docker desktop and run the appropriate container.
-
-2. Create and run a new container: open a CLI at the root of the project, and run the command
+1. Create and start a new container: open a CLI at the root of the project, and run the command
 ```
 wsl -e ./scripts/services/tgi-service.sh
 ```
-
-
+2. Start an existing container from Docker Desktop: Open the Docker Desktop client and run the appropriate container.
 3. Start an existing container with Docker's python API:
-<!-- #endregion -->
 
 ```python
-# # see:
-# # - https://github.com/docker/docker-py
-# # - https://docker-py.readthedocs.io/en/stable/containers.html
-# import docker
-# client = docker.from_env()
+# see:
+# - https://github.com/docker/docker-py
+# - https://docker-py.readthedocs.io/en/stable/containers.html
+container_id = '146dc7ff2d842b77c5bc173c53d1b2e1e4b02a0a5f96ea243307f44b30a773b6'
 
-# image = 'ghcr.io/huggingface/text-generation-inference:1.4'
-# volumes = ['./checkpoints:/checkpoints']
-
-# client.containers.run(image, volumes = volumes)
+container = docker.from_env().containers.get(container_id)
+container.start()
 ```
 
 ```python
 url = 'http://127.0.0.1:8080'
 ```
 
-### 2.1 Simple client around TGI service
+***
+
+
+### 1. Simple client around TGI service
 
 See the TGI [docs](https://huggingface.co/docs/text-generation-inference/quicktour).
+
+```python
+template = """<s>[INST] <<SYS>> {system} <</SYS>> {question} [/INST]"""
+system = "Provide a correct and short answer to the question."
+question = "How do you make cheese ?"
+
+query = template.replace('{system}', system).replace('{question}', question)
+```
 
 ```python
 headers = {"Content-Type": "application/json"}
 
 generation_config = dict(
-    temperature = 0.1,
-    top_p = .1,
-    max_tokens = 64,
+    do_sample = True,
+    temperature = 0.01,
+    top_k = 10,
+    top_p = 0.8,
+    max_new_tokens = 64,
+    repetition_penalty = 1.03,
     stream = True,
     seed = 42,
 )
 
 data = {
-    'inputs': 'What is the most beautiful city in the world ? please elaborate on your answer. Do not share your name.',
+    'inputs': query,
     'parameters': generation_config,
 }
 response = requests.post(f'{url}/generate', headers = headers, json = data)
@@ -173,18 +133,26 @@ response = requests.post(f'{url}/generate', headers = headers, json = data)
 response.json()['generated_text']
 ```
 
-### 2.2 Text-generation client around TGI service
+### 2. Text-generation client around TGI service
 
-See [Huggingface's official python client](https://github.com/huggingface/text-generation-inference/tree/main/clients/python) around TGI services. **Not working on local endpoints**.
+**Not working on local endpoints**. See [Huggingface's official python client](https://github.com/huggingface/text-generation-inference/tree/main/clients/python) around TGI services.
 
 ```python
 # client = InferenceAPIClient(url)
 # client = InferenceAPIAsyncClient(url)
 ```
 
-### 2.3 Huggingface-hub client around TGI service
+### 3. Huggingface-hub client around TGI service
 
 See [Huggingface-hub python client](https://huggingface.co/docs/text-generation-inference/basic_tutorials/consuming_tgi) around TGI services.
+
+```python
+template = """<s>[INST] <<SYS>> {system} <</SYS>> {question} [/INST]"""
+system = "Provide a correct and short answer to the question."
+question = "How do you make cheese ?"
+
+query = template.replace('{system}', system).replace('{question}', question)
+```
 
 ```python
 client = InferenceClient(model = url)
@@ -192,42 +160,46 @@ client = InferenceClient(model = url)
 
 ```python
 generation_config = dict(
-    temperature = 0.1,
-    top_p = .1,
+    do_sample = True,
+    temperature = 0.01,
+    top_k = 10,
+    top_p = 0.8,
     max_new_tokens = 64,
+    repetition_penalty = 1.03,
     stream = True,
     seed = 42,
 )
 
-response = client.text_generation("How do you make cheese ?", **generation_config)
+response = client.text_generation(query, **generation_config)
 ```
 
 ```python
 for token in response:
-    print(token, end = '')
+    print(token, end = '', flush = True)
 ```
 
-### 2.4 Langchain client around TGI service
+### 4. Langchain client around TGI service
 
-See the [langchain community official doc](https://python.langchain.com/docs/integrations/llms/huggingface_endpoint) (also see this [deprecated page](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference) in case of trouble), and [this example](https://towardsdatascience.com/llms-for-everyone-running-the-huggingface-text-generation-inference-in-google-colab-5adb3218a137), which shows how to stream response.
+See the [langchain community official doc](https://python.langchain.com/docs/integrations/llms/huggingface_endpoint) (also see this [deprecated page](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.huggingface_text_gen_inference.HuggingFaceTextGenInference.html#langchain-community-llms-huggingface-text-gen-inference-huggingfacetextgeninference) in case of trouble), and [this example](https://python.langchain.com/docs/expression_language/streaming#chains), which shows how to stream response.
 
 ```python
-template = """<s>[INST] <<SYS>>
-Provide a correct and short answer to the question.
-<</SYS>>
-{question} [/INST]"""
+template = """<s>[INST] <<SYS>> {system} <</SYS>> {question} [/INST]"""
+system = "Provide a correct and short answer to the question."
+question = "How do you make cheese ?"
 
-prompt = PromptTemplate(template = template, input_variables = ["question"])
+prompt = PromptTemplate(template = template, input_variables = ["system", "question"])
 ```
 
 ```python
 generation_config = dict(
-    max_new_tokens = 64,
+    do_sample = True,
+    temperature = 0.01,
     top_k = 10,
     top_p = 0.8,
-    temperature = 0.01,
+    max_new_tokens = 64,
     repetition_penalty = 1.03,
     streaming = True,
+    seed = 42,
 )
 
 llm = HuggingFaceTextGenInference(inference_server_url = url, **generation_config)
@@ -235,10 +207,13 @@ chain = prompt | llm | StrOutputParser()
 ```
 
 ```python
-chain.invoke({"question": "How do you make cheese ?"})
+response = chain.astream(dict(system = system, question = question))
+
+async for chunk in response:
+    print(chunk, end = '', flush = True)
 ```
 
-### 2.5 OpenAI client around TGI service
+### 5. OpenAI client around TGI service
 
 See the OpenAI-compatible [message API](https://huggingface.co/docs/text-generation-inference/messages_api), and this huggingface [blog post](https://huggingface.co/blog/tgi-messages-api).
 
@@ -276,16 +251,9 @@ chat_completion = client.chat.completions.create(**generation_config)
 
 ```python
 for message in chat_completion:
-    print(message.choices[0].delta.content, end = "")
+    print(message.choices[0].delta.content, end = '', flush = True)
 ```
 
 ```python
 
-```
-
-```python
-# in vLLM:
-# https://docs.mistral.ai/self-deployment/vllm/
-# https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/29
-# https://github.com/vllm-project/vllm/discussions/2112
 ```
