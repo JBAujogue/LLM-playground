@@ -27,6 +27,9 @@ This project was developed on a Windows 11 os, while some components require a l
       (kill all kernel) wsl --shutdown
       ```
 
+## Database setup
+
+
 ## Python setup
 This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
 1) Install miniconda on windows or on [linux](https://dev.to/sfpear/miniconda-in-wsl-3642).

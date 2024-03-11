@@ -69,25 +69,26 @@ chat_messages = [[
 
 ### Start backend service
 
-
+<!-- #region -->
 Run the backend service with one of the following methods:
 
 1. Create and start a new container: open a CLI at the root of the project, and run the command
+```bash
+wsl -e ./scripts/services/tgi-service-creation.sh
 ```
+2. Start an existing container in CLI: open a CLI at the root of the project, and run the command
+```bash
 wsl -e ./scripts/services/tgi-service.sh
 ```
-2. Start an existing container from Docker Desktop: Open the Docker Desktop client and run the appropriate container.
-3. Start an existing container with Docker's python API:
-
+3. Start an existing container from Docker Desktop: Open the Docker Desktop client and run the appropriate container.
+4. Start an existing container with Docker's python API:
 ```python
-# see:
-# - https://github.com/docker/docker-py
-# - https://docker-py.readthedocs.io/en/stable/containers.html
-container_id = '146dc7ff2d842b77c5bc173c53d1b2e1e4b02a0a5f96ea243307f44b30a773b6'
-
-container = docker.from_env().containers.get(container_id)
+container_name = 'tgi-service'
+container = docker.from_env().containers.get(container_name)
 container.start()
 ```
+see [docker-py](https://docker-py.readthedocs.io/en/stable/containers.html) for details.
+<!-- #endregion -->
 
 ```python
 url = 'http://127.0.0.1:8080'
