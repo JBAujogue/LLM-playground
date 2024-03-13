@@ -3,59 +3,84 @@ This project contains experiments on GenAI.
 
 
 # Getting Started
-## WSL & Docker setup
+## WSL setup
 This project was developed on a Windows 11 os, while some components require a linux os and are thus running inside a containerized environment backed by WSL.
 
-1) Install WSL and create a linux distribution following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install). See also the [wsl basic commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands).
+Install WSL and create a linux distribution following the [Microsoft official doc](https://learn.microsoft.com/en-us/windows/wsl/install). See also the [wsl basic commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands).
 
-2) Install [Docker desktop](https://docs.docker.com/desktop/install/windows-install/) or [Podman]() on the Windows os. 
+## Docker setup
+1) Install [Docker desktop](https://docs.docker.com/desktop/install/windows-install/) or [Podman]() on the Windows os. 
     - **Note**: All previous versions of Docker Engine and CLI installed directly through Linux distributions must be uninstalled before installing Docker Desktop.
     - Activate the WSL integration in Docker Desktop settings following [docker documentation](https://docs.docker.com/desktop/wsl/#turn-on-docker-desktop-wsl-2)
 
-3) Install `nvidia-container-toolkit` in your linux distro:
+2) Install `nvidia-container-toolkit` in your linux distro:
     - Launch a linux terminal by running the following command in a cmd (the `--distribution` flag being optional)
-      ```
+      ```bash
       wsl --distribution <distro-name>
       ```
     - Execute the install commands found in [nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
     - Allow docker to use nvidia Container Runtime by executing the commands found in [nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuration)
 
-4) Additional tips:
+3) Additional tips:
     - Terminate the running linux kernel:
-      ```
+      ```bash
       (kill one kernel) wsl -t <distro-name>
       (kill all kernel) wsl --shutdown
       ```
 
 ## Database setup
+1) Get [qdrant](https://qdrant.tech/documentation/guides/installation/#docker) latest docker image by running (in CMD or bash):
+    ```bash
+    docker pull qdrant/qdrant
+    ```
 
 
 ## Python setup
 This project uses python `3.11` as core interpreter, and poetry `1.6.1` as dependency manager.
 1) Install miniconda on windows or on [linux](https://dev.to/sfpear/miniconda-in-wsl-3642).
 2) Create a new conda environment with
-    ```
+    ```bash
     conda env create -f environment.yml
     ```
 
 3) Activate the environment with
-    ```
+    ```bash
     conda activate llm-playground
     ```
 
 4) Move to the project directory, and install the project dependencies with
-    ```
+    ```bash
     poetry install
     ```
 
 5) Launch a jupyter server with
-    ```
+    ```bash
     jupyter notebook
+    ```
+
+# How to use it
+## Run Qdrant vector database
+- create and run new qdrant vector database service:
+    ```bash
+    wsl -e ./scripts/services/qdrant-db-creation.sh
+    ```
+- run existing qdrant vector database service:
+    ```bash
+    wsl -e ./scripts/services/qdrant-db.sh
+    ```
+
+## Run Text Generation Inference LLM service
+- create and run new tgi llm service:
+    ```bash
+    wsl -e ./scripts/services/tgi-service-creation.sh
+    ```
+- run existing tgi llm service:
+    ```bash
+    wsl -e ./scripts/services/tgi-service.sh
     ```
 
 
 # Learning plan
-
 
 <table style="height:100%; width:100%; text-align:center;">
     <thead>
