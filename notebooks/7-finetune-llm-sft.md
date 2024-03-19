@@ -14,7 +14,7 @@ jupyter:
 
 <!-- #region -->
 References:
-- The model we finetune comes from Microsoft's Github project [PyCodeGPT](https://github.com/microsoft/PyCodeGPT), and is available on the Huggingface model hub [here](https://huggingface.co/Daoguang/PyCodeGPT).
+- Official Huggingface Supervized Fine-Tuning [tutorial guide](https://huggingface.co/docs/trl/sft_trainer).
 - Example [blog post](https://towardsdatascience.com/fine-tune-your-own-llama-2-model-in-a-colab-notebook-df9823a04a32) from Maxime Labonne
 - Example [blog post](https://adithyask.medium.com/a-beginners-guide-to-fine-tuning-mistral-7b-instruct-model-0f39647b20fe) on finetuning on code generation (see this [benchmark](https://github.com/huybery/Awesome-Code-LLM) of pretrained coding assistants).
 - Example [blog post](https://saankhya.medium.com/mistral-instruct-7b-finetuning-on-medmcqa-dataset-6ec2532b1ff1) on finetuning GPTQ-quantized model on medical QA
@@ -78,25 +78,25 @@ path_to_exp
 
 # 1. Prepare dataset
 
-The instruction format to use is model-dependant. Fortunately the tokenizer should carry a pre-defined template in its `chat_template` attribute, for instance when it was already instruction-tuned. In this case it is advised to keep using this template for subsequent finetuning, by calling the `apply_chat_template` method of the tokenizer. See the transformers [chat templating documentation](https://huggingface.co/docs/transformers/main/chat_templating) for details. If no template was set in the tokenizer than a default one is shipped, although you are free of using whatever new template you like by setting up a new one as described in this page [edit chat templates](https://huggingface.co/docs/transformers/main/chat_templating#advanced-adding-and-editing-chat-templates).
+The `SFTTrainer` class already supports standard formatting of datasets, see the huggingface [sft tutorial](https://huggingface.co/docs/trl/sft_trainer#dataset-format-support). Note that data items are subsequently converted to single string during training, in a format which is model-dependant and which depends on the pre-defined template in the `chat_template` attribute of the tokenizer. If this chat template already exists, for instance when the model was already instruction-tuned, then it will seamlessly used during training. If no template was set in the tokenizer then a default one is shipped, although you are free of using whatever new template you like by setting up a new one as described in this page [edit chat templates](https://huggingface.co/docs/transformers/main/chat_templating#advanced-adding-and-editing-chat-templates). Some utility function making the creation of template straightforward is also described [here](https://huggingface.co/docs/trl/sft_trainer#add-special-tokens-for-chat-format).
 
 ```python
-def create_text_rows(examples, tokenizer):
+def convert_to_chat_messages(examples, tokenizer):
     '''
     Create prompts using model's tokenizer template.
     '''
-    messages_list = [
+    messages_list = dict(messages = [
         [
-            {"role": "user", "content": f' {inst} Here are the inputs {inp} '},
-            {"role": "assistant", "content": f' {out} '},
+            dict(role = 'user', content = f' {inst} Here are the inputs {inp} '),
+            dict(role = 'assistant', content = f' {out} '),
         ]
         for inst, inp, out in zip(examples['instruction'], examples['input'], examples['output'])
-    ]
-    return dict(text = [
+    ])
+    return dict(messages = [
         tokenizer.apply_chat_template(
-            conversation = messages, tokenize = False, add_generation_prompt = False
+            conversation = m, tokenize = False, add_generation_prompt = False
         )
-        for messages in messages_list
+        for m in messages_list
     ])
 ```
 
@@ -108,22 +108,22 @@ tokenizer = AutoTokenizer.from_pretrained(input_model_name)
 # load dataset
 dataset = load_dataset(dataset_name, split = 'train')
 
-# create prompts within a new 'text' column
-dataset_with_texts = dataset.map(
-    function = lambda examples: create_text_rows(examples, tokenizer),
+# convert to chat messages within a new 'messages' column
+dataset_chat = dataset.map(
+    function = lambda examples: convert_to_chat_messages(examples, tokenizer),
+    remove_columns = dataset.column_names,
     batched = True,
 )
-
 # split into 80% train / 10% valid / 10% test
-dataset_train_else = dataset_with_texts.train_test_split(test_size = .2, seed = 42, shuffle = False)
+dataset_train_else = dataset_chat.train_test_split(test_size = .2, seed = 42, shuffle = False)
 dataset_valid_test = dataset_train_else['test'].train_test_split(test_size = .5, seed = 42, shuffle = False)
 
 # convert to dict of datasets
 dataset_dict = dict(
     train = dataset_train_else['train'],
     valid = dataset_valid_test['train'],
-    test  = dataset_valid_test['test'],
-    all   = dataset_with_texts,
+    test = dataset_valid_test['test'],
+    all = dataset_chat,
 )
 ```
 
@@ -137,13 +137,14 @@ tensorboard --logdir=mlruns
 
 ### Load tokenizer and model
 
-Appropriately choosing the padding token and why it is important is discussed in this [issue](https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285), see this alternative [solution](https://medium.com/@mayvic/solving-the-issue-of-falcon-text-generation-never-stopping-e8f599eae8f0) as well.
+According to this [demo notebook](https://colab.research.google.com/drive/1_TIrmuKOFhuRRiTWN94iLKUFu6ZX4ceb?usp=sharing#scrollTo=l-EwnZd0jpwB):
+
+> We disable the exllama kernel because training with exllama kernel is unstable. To do that, we pass a GPTQConfig object with disable_exllama=True. This will overwrite the value stored in the config of the model.
+
 
 ```python
 # Load tokenizer
 tokenizer = AutoTokenizer.from_pretrained(input_model_name)
-tokenizer.padding_side = "right"
-tokenizer.pad_token = tokenizer.unk_token 
 
 # Load base model
 quantization_config = dict(bits = 4, use_exllama = False)
@@ -174,21 +175,34 @@ generation_params = dict(
 set_seed(42)
 model.eval()
 with torch.no_grad():
-    message = [{"role": "user", "content": "Write a function that prints 'hello world' in python"}]
+    message = [dict(role = 'user', content = "Write a function that prints 'hello world' in python")]
     message = tokenizer.apply_chat_template(message, tokenize = False, add_generation_prompt = True)
     inputs = tokenizer(message, return_tensors = 'pt').to(model.device)
     tensors = model.generate(**inputs, **generation_params)
     answers = tokenizer.batch_decode(tensors)
 ```
 
-### Train model
+### Prepare tokenizer and model for training
+
+As stated in Huggingface [SFT usage](https://huggingface.co/docs/trl/sft_trainer):
+
+> Make sure to have a pad_token_id which is different from eos_token_id which can result in the model not properly predicting EOS (End of Sentence) tokens during generation.
+
+Appropriately choosing the padding token and why it is important is discussed in this [issue](https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285), see this alternative [solution](https://medium.com/@mayvic/solving-the-issue-of-falcon-text-generation-never-stopping-e8f599eae8f0) as well.
 
 ```python
+# set padding on the right to pad examples for training
+# set a padding token
+tokenizer.padding_side = "right"
+tokenizer.pad_token = tokenizer.unk_token 
+
 model.config.use_cache = False
 model.config.pretraining_tp = 1
 model.gradient_checkpointing_enable()
 model = prepare_model_for_kbit_training(model)
 ```
+
+### Train model
 
 ```python
 peft_config = LoraConfig(
@@ -226,6 +240,7 @@ training_config = TrainingArguments(
 trainer_config = dict(
     max_seq_length = None,
     packing = False,
+    neftune_noise_alpha = 5,
 )
 
 # Set supervised fine-tuning trainer
@@ -234,7 +249,7 @@ trainer = SFTTrainer(
     model = model,
     train_dataset = dataset_dict['train'],
     eval_dataset = dataset_dict['valid'],
-    dataset_text_field = "text",
+    dataset_text_field = 'messages',
     peft_config = peft_config,
     args = training_config,
     **trainer_config,
@@ -266,7 +281,7 @@ generation_params = dict(
 set_seed(42)
 model.eval()
 with torch.no_grad():
-    message = [{"role": "user", "content": "Write a function that prints 'hello world' in python"}]
+    message = [dict(role = 'user', content = "Write a function that prints 'hello world' in python")]
     message = tokenizer.apply_chat_template(message, tokenize = False, add_generation_prompt = True)
     inputs = tokenizer(message, return_tensors = 'pt').to(model.device)
     tensors = model.generate(**inputs, **generation_params)
@@ -332,7 +347,7 @@ generation_params = dict(
 set_seed(42)
 finetuned_model.eval()
 with torch.no_grad():
-    message = [{"role": "user", "content": "Write a function that prints 'hello world' in python"}]
+    message = [dict(role = 'user', content = "Write a function that prints 'hello world' in python")]
     message = tokenizer.apply_chat_template(message, tokenize = False, add_generation_prompt = True)
     inputs = tokenizer(message, return_tensors = 'pt').to(model.device)
     tensors = finetuned_model.generate(**inputs, **generation_params)
