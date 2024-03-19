@@ -15,6 +15,7 @@ jupyter:
 <!-- #region -->
 References:
 - Official Huggingface Supervized Fine-Tuning [tutorial guide](https://huggingface.co/docs/trl/sft_trainer).
+- Official W&B [tutorial guide](https://wandb.ai/capecape/alpaca_ft/reports/How-to-Fine-tune-an-LLM-Part-3-The-HuggingFace-Trainer--Vmlldzo1OTEyNjMy).
 - Example [blog post](https://towardsdatascience.com/fine-tune-your-own-llama-2-model-in-a-colab-notebook-df9823a04a32) from Maxime Labonne
 - Example [blog post](https://adithyask.medium.com/a-beginners-guide-to-fine-tuning-mistral-7b-instruct-model-0f39647b20fe) on finetuning on code generation (see this [benchmark](https://github.com/huybery/Awesome-Code-LLM) of pretrained coding assistants).
 - Example [blog post](https://saankhya.medium.com/mistral-instruct-7b-finetuning-on-medmcqa-dataset-6ec2532b1ff1) on finetuning GPTQ-quantized model on medical QA
@@ -52,7 +53,7 @@ from transformers import (
     set_seed,
 )
 from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
-from trl import SFTTrainer
+from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 ```
 
 ### Global variables
@@ -78,20 +79,22 @@ path_to_exp
 
 # 1. Prepare dataset
 
-The `SFTTrainer` class already supports standard formatting of datasets, see the huggingface [sft tutorial](https://huggingface.co/docs/trl/sft_trainer#dataset-format-support). Note that data items are subsequently converted to single string during training, in a format which is model-dependant and which depends on the pre-defined template in the `chat_template` attribute of the tokenizer. If this chat template already exists, for instance when the model was already instruction-tuned, then it will seamlessly used during training. If no template was set in the tokenizer then a default one is shipped, although you are free of using whatever new template you like by setting up a new one as described in this page [edit chat templates](https://huggingface.co/docs/transformers/main/chat_templating#advanced-adding-and-editing-chat-templates). Some utility function making the creation of template straightforward is also described [here](https://huggingface.co/docs/trl/sft_trainer#add-special-tokens-for-chat-format).
+Data items are converted to single string in a format which is model-dependant and which depends on the pre-defined template in the `chat_template` attribute of the tokenizer. If this chat template already exists, for instance when the model was already instruction-tuned, then it is advised to keep using it for futher finetuning. If no template was set in the tokenizer then a default one is shipped, although you are free of using whatever new template you like by setting up a new one as described in this page [edit chat templates](https://huggingface.co/docs/transformers/main/chat_templating#advanced-adding-and-editing-chat-templates). Some utility function making the creation of template straightforward is also described [here](https://huggingface.co/docs/trl/sft_trainer#add-special-tokens-for-chat-format).
+
+ The `SFTTrainer` class natively supports formatting of datasets as list of chat messages, see the huggingface [sft tutorial](https://huggingface.co/docs/trl/sft_trainer#dataset-format-support), but calling the `apply_chat_template` by ourselves make the dataset seamlessly compatible with other finetuning features, such as [completion-only finetuning](https://huggingface.co/docs/trl/sft_trainer#train-on-completions-only).)
 
 ```python
-def convert_to_chat_messages(examples, tokenizer):
+def apply_chat_template(examples, tokenizer):
     '''
     Create prompts using model's tokenizer template.
     '''
-    messages_list = dict(messages = [
+    messages_list = [
         [
             dict(role = 'user', content = f' {inst} Here are the inputs {inp} '),
             dict(role = 'assistant', content = f' {out} '),
         ]
         for inst, inp, out in zip(examples['instruction'], examples['input'], examples['output'])
-    ])
+    ]
     return dict(messages = [
         tokenizer.apply_chat_template(
             conversation = m, tokenize = False, add_generation_prompt = False
@@ -110,7 +113,7 @@ dataset = load_dataset(dataset_name, split = 'train')
 
 # convert to chat messages within a new 'messages' column
 dataset_chat = dataset.map(
-    function = lambda examples: convert_to_chat_messages(examples, tokenizer),
+    function = lambda examples: apply_chat_template(examples, tokenizer),
     remove_columns = dataset.column_names,
     batched = True,
 )
@@ -155,7 +158,6 @@ model_config = dict(
     quantization_config = quantization_config,
     device_map = 'auto',
 )
-
 model = AutoModelForCausalLM.from_pretrained(**model_config)
 ```
 
@@ -204,11 +206,17 @@ model = prepare_model_for_kbit_training(model)
 
 ### Train model
 
+We perform Instruction masking using the [DataCollatorForCompletionOnlyLM](https://github.com/huggingface/trl/blob/main/trl/trainer/utils.py) class from the `trl` library in order to make the loss only computed on tokens of the LLM answer. As quoted [here]():
+
+>  Instruction masking consists in setting the token labels of the instructions to -100 (the default value that the CrossEntropy PyTorch function ignores). This way, you're only back-propagating on the completions.
+
+See also the [completion-only finetuning](https://huggingface.co/docs/trl/sft_trainer#train-on-completions-only) tutorial.
+
 ```python
 peft_config = LoraConfig(
     task_type = "CAUSAL_LM",
     bias = "none",
-    r = 64,
+    r = 32,
     lora_alpha = 16,
     lora_dropout = 0.05,
 )
@@ -239,18 +247,19 @@ training_config = TrainingArguments(
 
 trainer_config = dict(
     max_seq_length = None,
-    packing = False,
     neftune_noise_alpha = 5,
+    packing = False,
+    data_collator = DataCollatorForCompletionOnlyLM(response_template = '[/INST]', tokenizer = tokenizer),
+    dataset_text_field = 'messages',
 )
 
 # Set supervised fine-tuning trainer
 trainer = SFTTrainer(
     tokenizer = tokenizer,
     model = model,
+    peft_config = peft_config,
     train_dataset = dataset_dict['train'],
     eval_dataset = dataset_dict['valid'],
-    dataset_text_field = 'messages',
-    peft_config = peft_config,
     args = training_config,
     **trainer_config,
 )
@@ -263,6 +272,13 @@ trainer.model.print_trainable_parameters()
 ```python
 trainer.train()
 ```
+
+### Compute test score
+
+The `evaluate` method of a Trainer object does not work out of the box:
+
+Calling `trainer.evaluate()` runs loss computation on the trainer's `eval_dataset` attribute, which was internally preprocessed and is described by the columns `['input_ids', 'attention_mask']`. In turns, calling `trainer.evaluate(dataset_dict['test'])` raises an error since the dataset passed as parameter is descivbed by the columns `['messages']`.
+
 
 ### Run inference post training
 
