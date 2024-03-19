@@ -5,7 +5,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.16.1
+      jupytext_version: 1.16.0
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -22,6 +22,15 @@ References:
 
 Unfortunately all examples provided here carry a quantization step prior to training, which is not possible as-is on CPU.
 We therefore adapt this material to run finetuning of a "small" **unquantized** model with 110M parameters on CPU.
+
+References
+- [Finetune Your Own Llama 2 Model in a Colab Notebook](https://towardsdatascience.com/fine-tune-your-own-llama-2-model-in-a-colab-notebook-df9823a04a32)
+- [Finetuning Mistral 7B Model with Your Custom Data](https://python.plainenglish.io/intruct-fine-tuning-mistral-7b-model-with-your-custom-data-7eb22921a483)
+- [trl code snippet for SFT](https://github.com/huggingface/trl?tab=readme-ov-file#sfttrainer)
+
+Frameworks:
+- [trl](https://github.com/huggingface/trl)
+- [Axolotl](https://github.com/OpenAccess-AI-Collective/axolotl)
 
 
 Reflections:
