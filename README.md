@@ -60,23 +60,29 @@ This project uses python `3.11` as core interpreter, and poetry `1.6.1` as depen
 
 # How to use it
 ## Run Qdrant vector database
-- create and run new qdrant vector database service:
+We dedicate a docker container with name `qdrant-db` to the vector database backend microservice.
+- Create and run new qdrant vector database service:
     ```bash
-    wsl -e ./scripts/services/qdrant-db-creation.sh
+    wsl -e ./scripts/services/qdrant/qdrant-db.sh
     ```
-- run existing qdrant vector database service:
+- Run existing qdrant vector database service:
     ```bash
-    wsl -e ./scripts/services/qdrant-db.sh
+    docker start qdrant-db
     ```
 
+
 ## Run Text Generation Inference LLM service
-- create and run new tgi llm service:
+We dedicate a docker container with name `tgi-service` to a TGI-based LLM backend microservice.
+- Create and run new TGI llm service:
+    Launch docker desktop, open a cmd or shell and run
     ```bash
-    wsl -e ./scripts/services/tgi-service-creation.sh
+    wsl -e ./scripts/services/tgi/tgi-service.sh
     ```
-- run existing tgi llm service:
+
+- Run existing TGI llm service:
+    Launch docker desktop, open a cmd or shell and run
     ```bash
-    wsl -e ./scripts/services/tgi-service.sh
+    docker start tgi-service
     ```
 
 
