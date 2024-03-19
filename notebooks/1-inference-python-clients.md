@@ -5,7 +5,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.16.0
+      jupytext_version: 1.16.1
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -29,6 +29,7 @@ import copy
 
 import pandas as pd
 import torch
+from transformers import set_seed
 ```
 
 ```python
@@ -98,17 +99,19 @@ zephyr3b_chat_messages = [[
 Pick up a choice here:
 
 ```python
-model_id = zephyr3b_model_id
-chat_messages = zephyr3b_chat_messages
+model_id = zephyr7b_model_id
+chat_messages = zephyr7b_chat_messages
 ```
 
-# 1. Huggingface `transformers`
+# 1. Huggingface transformers
 
 - Loading a `GPTQ`-quantized model rely on the [auto-gptq](https://huggingface.co/docs/transformers/quantization?bnb=8-bit#autogptq) and [optimum](https://huggingface.co/docs/optimum/index) packages
 - Using the `device_map` keyword rely on the [accelerate](https://huggingface.co/docs/transformers/pipeline_tutorial#using-pipeline-on-large-models-with--accelerate-) package
 
+For inference, a LLM uses a template under the hood in order to aggregate instructions, context and past utterences into a single string. When calling this aggregation step, it is important to set `add_generation_prompt = True`, so that the final string is completed on the right with keywords marking the begining of a LLM's answer, thus engaging it to generate a response. See the transformers [documentation](https://huggingface.co/docs/transformers/main/chat_templating#how-do-i-use-chat-templates) about how to use chat templates.
 
-## 1.1 Huggingface `pipeline`
+
+## 1.1 Pipeline
 
 ```python
 from transformers import pipeline, TextStreamer
@@ -118,47 +121,43 @@ from transformers import pipeline, TextStreamer
 pipeline_config = dict(
     task = 'text-generation', 
     model = model_id, 
-    device_map = device,
+    device_map = 'auto',
     trust_remote_code = True,
 )
+set_seed(42)
 
 llm = pipeline(**pipeline_config)
 ```
 
-```python
-messages = [
-    llm.tokenizer.apply_chat_template(m, tokenize = False, add_generation_prompt = True)
-    for m in chat_messages
-]
-```
-
-Generation arguments are provided at https://huggingface.co/docs/transformers/main_classes/text_generation .
+Generation arguments are provided [here](https://huggingface.co/docs/transformers/main_classes/text_generation).
 
 ```python
 %%time
 
 generation_params = dict(
     streamer = TextStreamer(llm.tokenizer, skip_prompt = True, skip_special_tokens = True),
-    max_new_tokens = 256,
+    max_new_tokens = 128,
     num_beams = 1,
     batch_size = 1,
     do_sample = True,
-    temperature = 0.7,
-    top_p = 0.95,
+    temperature = 0.2,
+    top_p = 0.9,
     top_k = 40,
     repetition_penalty = 1.1,
 )
 
-answers = llm(messages, **generation_params)
+answers = llm(chat_messages, **generation_params)
 ```
+
+Note that input conversations are **not batched during inference**, but processed sequentially.
 
 ```python
 for a in answers:
-    print(a[0]["generated_text"])
+    print(a[0]["generated_text"][-1])
     print('---')
 ```
 
-## 1.2 Huggingface `tokenizer` & `model`
+## 1.2 Tokenizer & model
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -167,7 +166,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 ```python
 model_config = dict(
     pretrained_model_name_or_path = model_id, 
-    device_map = device,
+    device_map = 'auto',
     trust_remote_code = True,
 )
 
@@ -203,16 +202,18 @@ tensors = model.generate(inputs.to(model.device), **generation_params)
 answers = tokenizer.batch_decode(tensors)
 ```
 
+Note that input conversations are **batched during inference**, and therefore answers are consequently batched and padded.
+
 ```python
 for a in answers:
     print(a)
     print('---')
 ```
 
-# 2. `ctransformers`
+# 2. ctransformers
 
 - `ctransformers` makes faster CPU inference speed compared to base `transformers`, but support is limited to base or GGUF-quantized models.
-- it also runs on GPU when installed with `ctransformers[cuda]` (although in this case it is best to go with `transformers` as it is not limited to GGUF quantization).
+- It is by now unmaintained.
 
 ```python
 from ctransformers import AutoModelForCausalLM
@@ -255,9 +256,9 @@ answers = llm(messages, **generation_params)
 ```
 
 <!-- #region -->
-# 3 `llama-index` 
+# 3 llama-index
 
-## 3.1 llama-index wrapper around Huggingface
+## 3.1 Huggingface wrapper
 
 See `llama-index` [documentation](https://docs.llamaindex.ai/en/stable/module_guides/models/llms.html#using-llms) for instanciating models through its Huggingface wrapper.
 
@@ -334,9 +335,9 @@ for a in answers_complete:
     print('---')
 ```
 
-# 4. `langchain` 
+# 4. langchain
 
-## 4.1 langchain wrapper around huggingface
+## 4.1 Huggingface wrapper
 
 ```python
 from langchain.llms.huggingface_pipeline import HuggingFacePipeline
