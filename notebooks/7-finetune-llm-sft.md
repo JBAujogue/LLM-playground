@@ -14,8 +14,9 @@ jupyter:
 
 <!-- #region -->
 References:
-- Official Huggingface Supervized Fine-Tuning [tutorial guide](https://huggingface.co/docs/trl/sft_trainer).
-- Official W&B [tutorial guide](https://wandb.ai/capecape/alpaca_ft/reports/How-to-Fine-tune-an-LLM-Part-3-The-HuggingFace-Trainer--Vmlldzo1OTEyNjMy).
+- Huggingface Supervized Fine-Tuning [tutorial guide](https://huggingface.co/docs/trl/sft_trainer).
+- W&B [tutorial guide](https://wandb.ai/capecape/alpaca_ft/reports/How-to-Fine-tune-an-LLM-Part-3-The-HuggingFace-Trainer--Vmlldzo1OTEyNjMy).
+- Confident-AI [tutorial guide](https://www.confident-ai.com/blog/the-ultimate-guide-to-fine-tune-llama-2-with-llm-evaluations#evaluating-a-fine-tuned-llm-with-deepeval).
 - Example [blog post](https://towardsdatascience.com/fine-tune-your-own-llama-2-model-in-a-colab-notebook-df9823a04a32) from Maxime Labonne
 - Example [blog post](https://adithyask.medium.com/a-beginners-guide-to-fine-tuning-mistral-7b-instruct-model-0f39647b20fe) on finetuning on code generation (see this [benchmark](https://github.com/huybery/Awesome-Code-LLM) of pretrained coding assistants).
 - Example [blog post](https://saankhya.medium.com/mistral-instruct-7b-finetuning-on-medmcqa-dataset-6ec2532b1ff1) on finetuning GPTQ-quantized model on medical QA
@@ -93,11 +94,13 @@ def apply_chat_template(examples, tokenizer):
             dict(role = 'user', content = f' {inst} Here are the inputs {inp} '),
             dict(role = 'assistant', content = f' {out} '),
         ]
-        for inst, inp, out in zip(examples['instruction'], examples['input'], examples['output'])
+        for inst, inp, out in zip(
+            examples['instruction'], examples['input'], examples['output']
+        )
     ]
-    return dict(messages = [
+    return dict(text = [
         tokenizer.apply_chat_template(
-            conversation = m, tokenize = False, add_generation_prompt = False
+            m, tokenize = False, add_generation_prompt = False
         )
         for m in messages_list
     ])
@@ -131,11 +134,6 @@ dataset_dict = dict(
 ```
 
 # 2. Select finetuning protocol
-
-You can track metrics in tensorboard as finetuning proceeds: After opening a conda interpreter, moving to the repo's root directory and activating the environment, Tensorboard can be run with the command
-```
-tensorboard --logdir=mlruns
-```
 
 
 ### Load tokenizer and model
@@ -186,25 +184,27 @@ with torch.no_grad():
 
 ### Prepare tokenizer and model for training
 
-As stated in Huggingface [SFT usage](https://huggingface.co/docs/trl/sft_trainer):
+We further set the padding side to the right for batched finetuning, and set a padding token to the tokenizer when it does not natively carry one.<br>
+Appropriately choosing the padding token is important, as stated in Huggingface [SFT usage](https://huggingface.co/docs/trl/sft_trainer):
 
 > Make sure to have a pad_token_id which is different from eos_token_id which can result in the model not properly predicting EOS (End of Sentence) tokens during generation.
 
-Appropriately choosing the padding token and why it is important is discussed in this [issue](https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285), see this alternative [solution](https://medium.com/@mayvic/solving-the-issue-of-falcon-text-generation-never-stopping-e8f599eae8f0) as well.
+See also this [issue](https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285) and this alternative [solution](https://medium.com/@mayvic/solving-the-issue-of-falcon-text-generation-never-stopping-e8f599eae8f0) as well.
 
 ```python
-# set padding on the right to pad examples for training
-# set a padding token
 tokenizer.padding_side = "right"
-tokenizer.pad_token = tokenizer.unk_token 
+if not tokenizer.pad_token:
+    tokenizer.pad_token = tokenizer.unk_token 
+```
 
+```python
 model.config.use_cache = False
 model.config.pretraining_tp = 1
 model.gradient_checkpointing_enable()
 model = prepare_model_for_kbit_training(model)
 ```
 
-### Train model
+### Prepare trainer
 
 We perform Instruction masking using the [DataCollatorForCompletionOnlyLM](https://github.com/huggingface/trl/blob/main/trl/trainer/utils.py) class from the `trl` library in order to make the loss only computed on tokens of the LLM answer. As quoted [here]():
 
@@ -228,11 +228,11 @@ training_config = TrainingArguments(
     per_device_eval_batch_size = 4,
     gradient_accumulation_steps = 1,
     gradient_checkpointing = True,
-    optim = "adamw_torch",
+    optim = "paged_adamw_32bit",
     learning_rate = 3e-4,
     weight_decay = 1e-3,
-    # fp16 = False,
-    # bf16 = False,
+    fp16 = False,
+    bf16 = False,
     max_grad_norm = 0.3,
     max_steps = 300,
     warmup_ratio = 0.05,
@@ -250,7 +250,7 @@ trainer_config = dict(
     neftune_noise_alpha = 5,
     packing = False,
     data_collator = DataCollatorForCompletionOnlyLM(response_template = '[/INST]', tokenizer = tokenizer),
-    dataset_text_field = 'messages',
+    dataset_text_field = 'text',
 )
 
 # Set supervised fine-tuning trainer
@@ -269,6 +269,19 @@ trainer = SFTTrainer(
 trainer.model.print_trainable_parameters()
 ```
 
+Remark: The trainer has a `model` attribute wihich does _not_ correspond to the original model. Instead, the original model is contained into a sub-sub-subattribute of the trainer object:
+
+```python
+model == trainer.model.base_model.model
+```
+
+### Run training
+
+You can track metrics in tensorboard as finetuning proceeds: After opening a conda interpreter, moving to the repo's root directory and activating the environment, Tensorboard can be run with the command
+```
+tensorboard --logdir=mlruns
+```
+
 ```python
 trainer.train()
 ```
@@ -279,6 +292,9 @@ The `evaluate` method of a Trainer object does not work out of the box:
 
 Calling `trainer.evaluate()` runs loss computation on the trainer's `eval_dataset` attribute, which was internally preprocessed and is described by the columns `['input_ids', 'attention_mask']`. In turns, calling `trainer.evaluate(dataset_dict['test'])` raises an error since the dataset passed as parameter is descivbed by the columns `['messages']`.
 
+```python
+
+```
 
 ### Run inference post training
 
@@ -318,33 +334,38 @@ After carefully selecting your finetuning hyperparameters through multiple train
 # - run finetuning
 ```
 
-### Merge and serialize model
+### Save & load result
+
+The trained adapter can be merged to the original model, and the result can be subsequently serialized to disk, as the following code snippet shows:
 
 ```python
-# merge model and adapter
-merged_model = trainer.model.merge_and_unload()
+# # merge model and adapter
+# merged_model = trainer.model.merge_and_unload()
+
+# # save merged model
+# merged_model.save_pretrained(os.path.join(path_to_exp, 'model'))
+
+# tokenizer.padding_side = 'left'
+# tokenizer.save_pretrained(os.path.join(path_to_exp, 'tokenizer'))
 ```
+
+However in order to save disk space and be able to plug and unplug it at will, we consider saving tha adapter only:
 
 ```python
 # save merged model
-merged_model.save_pretrained(os.path.join(path_to_exp, 'model'))
-```
+trainer.model.save_pretrained(os.path.join(path_to_exp, 'model'))
 
-```python
 tokenizer.padding_side = 'left'
 tokenizer.save_pretrained(os.path.join(path_to_exp, 'tokenizer'))
 ```
 
-### Load finetuned model
+### Run inference
 
 ```python
-# load tokenizer 
+# re-load tokenizer & finetuned model
 tokenizer = AutoTokenizer.from_pretrained(os.path.join(path_to_exp, 'tokenizer'))
-
-# load finetuned model
 finetuned_model = AutoModelForCausalLM.from_pretrained(
-    os.path.join(path_to_exp, 'model'),
-    device_map = 'auto',
+    os.path.join(path_to_exp, 'model'), device_map = 'auto',
 ).eval()
 ```
 
@@ -365,7 +386,7 @@ finetuned_model.eval()
 with torch.no_grad():
     message = [dict(role = 'user', content = "Write a function that prints 'hello world' in python")]
     message = tokenizer.apply_chat_template(message, tokenize = False, add_generation_prompt = True)
-    inputs = tokenizer(message, return_tensors = 'pt').to(model.device)
+    inputs = tokenizer(message, return_tensors = 'pt').to(finetuned_model.device)
     tensors = finetuned_model.generate(**inputs, **generation_params)
     answers = tokenizer.batch_decode(tensors)
 ```

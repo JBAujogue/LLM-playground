@@ -351,10 +351,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td style="font-size:20px">Github</td>
         </tr>
         <tr>
-            <td >LLM-autoeval</td>
-            <td > </td>
-            <td > </td>
-            <td href="https://github.com/mlabonne/llm-autoeval">repo</td>
+            <td>LLM-autoeval</td>
+            <td> </td>
+            <td> </td>
+            <td>
+                <a href="https://github.com/mlabonne/llm-autoeval">Github</a>
+            </td>
+        </tr>
+        <tr>
+            <td>Deepeval</td>
+            <td> </td>
+            <td>
+                <a href="https://docs.confident-ai.com/docs/integrations-huggingface">Integration in Huggingface Trainer</a>
+            </td>
+            <td>
+                <a href="https://github.com/confident-ai/deepeval">Github</a>
+            </td>
         </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
