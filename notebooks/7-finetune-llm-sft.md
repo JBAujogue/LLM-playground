@@ -70,12 +70,18 @@ path_to_runs = os.path.join(path_to_repo, 'mlruns')
 dataset_name = 'iamtarun/python_code_instructions_18k_alpaca'
 
 input_model_name = 'TheBloke/Mistral-7B-Instruct-v0.2-GPTQ'
-output_model_name = 'mistral-7b-instruct-v0.2-gptq--18k-alpaca'
+output_model_name = 'mistral-7b-instruct-v0.2-gptq-lora--18k-alpaca'
 ```
 
 ```python
 path_to_exp = os.path.join(path_to_runs, output_model_name)
 path_to_exp
+```
+
+```python
+
+
+
 ```
 
 # 1. Prepare dataset

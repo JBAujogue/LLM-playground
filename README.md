@@ -413,6 +413,20 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td style="font-size:20px">Paper</td>
         </tr>
         <tr>
+            <td>Retrieval Aware Fine-tuning (RAFT)</td>
+            <td> 
+                <a href="https://github.com/ShishirPatil/gorilla/tree/main/raft">
+                    <div style="text-align: center;">Github</div>
+                </a>
+            </td>
+            <td> </td>
+            <td>
+                <a href="https://huggingface.co/papers/2403.10131">
+                    <div style="text-align: center;">2403</div>
+                </a>
+            </td>
+        </tr>
+        <tr>
             <td>Automatic Data Selection in Instruction Tuning</td>
             <td> </td>
             <td> </td>
