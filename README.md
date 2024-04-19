@@ -334,6 +334,14 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td></td>
             <td></td>
         </tr>
+        <tr>
+            <td>ATOM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="https://arxiv.org/pdf/2310.19102.pdf">2310</a>
+            </td>
+        </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
