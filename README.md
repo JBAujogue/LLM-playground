@@ -565,7 +565,7 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td> </td>
         </tr>
         <tr>
-            <td colspan=4; style="font-size:20px">
+            <td colspan=4; style="font-size:20px"; text-align:center>
                 - Further readings -
             </td>
         </tr>
