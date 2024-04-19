@@ -564,6 +564,16 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td> </td>
             <td> </td>
         </tr>
+        <tr>
+            <td colspan=4; style="font-size:20px">
+                - Further readings -
+            </td>
+        </tr>
+        <tr>
+            <td colspan=4;>
+                <a href="https://github.com/huggingface/alignment-handbook/tree/main">HF alignment handbook</a>,
+            </td>
+        </tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
     </tbody>
