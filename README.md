@@ -554,6 +554,16 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td> </td>
             <td> </td>
         </tr>
+        <tr>
+            <td>ORPO: Odds Ratio Preference Optimization</td>
+            <td> </td>
+            <td> </td>
+            <td>
+                <a href="https://arxiv.org/pdf/2403.07691.pdf">
+                    <div style="text-align: center;">2403</div>
+                </a>
+            </td>
+        </tr>
         <! ----------------- 7.2 Frameworks ------------------>
         <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> </th></tr>
         <tr>
