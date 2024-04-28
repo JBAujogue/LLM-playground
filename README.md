@@ -89,6 +89,7 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
 # Learning plan
 
 <table style="height:100%; width:100%; text-align:center;">
+    <! ----------------- 1.1 Frameworks ------------------>
     <thead>
         <tr>
             <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">1. Inference</th>
@@ -96,7 +97,7 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
     </thead>
     <tbody>
         <tr>
-            <td style="font-size:20px">Method</td>
+            <td style="font-size:20px">Framework</td>
             <td style="font-size:20px">Documentation</td>
             <td style="font-size:20px">Examples</td>
             <td style="font-size:20px">Comment</td>
@@ -112,6 +113,59 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td><a href="https://github.com/marella/ctransformers">Github</a></td>
             <td> </td>
             <td>CPU-only, Unmaintained</td>
+        </tr>
+        <! ----------------- 1.2 Services ------------------>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> </th></tr>
+        <tr>
+            <td style="font-size:20px">Service</td>
+            <td style="font-size:20px">Documentation</td>
+            <td style="font-size:20px">Examples</td>
+            <td style="font-size:20px">Comment</td>
+        </tr>
+        <tr>
+            <td>vLLM</td>
+            <td>
+                <a href="https://github.com/vllm-project/vllm">Github</a>,
+                <a href="https://www.anyscale.com/blog/continuous-batching-llm-inference">Inference speed blog post</a>,
+                <a href="https://arxiv.org/pdf/2309.06180.pdf">2309</a>
+            </td>
+            <td>
+                <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a>, 
+                <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>,
+                <a href="https://betterprogramming.pub/superfast-llm-text-generation-with-vllm-on-windows-11-4a6617d4e0b3">Run in WSL</a>
+            </td>
+            <td>Linux-only</td>
+        </tr>
+        <tr>
+            <td>TGI: Text Generation Inference</td>
+            <td>
+                <a href="https://github.com/huggingface/text-generation-inference">Github</a>
+                <a href="https://huggingface.co/docs/text-generation-inference/index">HF page</a>
+            </td>
+            <td> 
+                <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>,
+                <a href="https://kaitchup.substack.com/p/serve-large-language-models-from">Run again with WSL & Docker</a>,
+                <a href="https://vilsonrodrigues.medium.com/serving-falcon-models-with-text-generation-inference-tgi-5f32005c663b">External usage</a>,
+                <a href="https://huggingface.co/blog/tgi-messages-api">Use with OpenAI / langchain / llama-index client</a>
+            </td>
+            <td>Linux-only</td>
+        </tr>
+        <tr>
+            <td>Triton Inference Server</td>
+            <td>
+                <a href="https://github.com/triton-inference-server/pytriton/tree/main">Github</a>,
+                <a href="https://github.com/triton-inference-server/pytriton/tree/main">pytriton Github</a>
+            </td>
+            <td>
+                <a href="https://medium.com/trendyol-tech/deploying-a-large-language-model-llm-with-tensorrt-llm-on-triton-inference-server-a-step-by-step-d53fccc856fa">tensorRT with TIS</a>
+            </td>
+            <td>Linux-only</td>
+        </tr>
+        <tr>
+            <td>Llamafile</td>
+            <td> </td>
+            <td> </td>
+            <td> </td>
         </tr>
         <tr>
             <td>ollama</td>
@@ -129,50 +183,21 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td>DeepSparse</td>
             <td><a href="https://github.com/neuralmagic/deepsparse">Github</a></td>
             <td> </td>
-            <td>Service, CPU-only, Linux-only</td>
+            <td>CPU-only, Linux-only</td>
         </tr>
+        <! ----------------- 1.3 SDKs ------------------>
+        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> </th></tr>
         <tr>
-            <td>vLLM</td>
-            <td>
-                <a href="https://github.com/vllm-project/vllm">Github</a>,
-                <a href="https://www.anyscale.com/blog/continuous-batching-llm-inference">Inference speed blog post</a>,
-                <a href="https://arxiv.org/pdf/2309.06180.pdf">Article</a>
-            </td>
-            <td>
-                <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html">Official quickstart</a>, 
-                <a href="https://github.com/vllm-project/vllm/tree/main/examples">Official list of examples</a>,
-                <a href="https://betterprogramming.pub/superfast-llm-text-generation-with-vllm-on-windows-11-4a6617d4e0b3">Run in WSL</a>
-            </td>
-            <td>Service, Linux-only</td>
-        </tr>
-        <tr>
-            <td>TGI: Text Generation Inference</td>
-            <td>
-                <a href="https://github.com/huggingface/text-generation-inference">Github</a>
-                <a href="https://huggingface.co/docs/text-generation-inference/index">HF page</a>
-            </td>
-            <td> 
-                <a href="https://github.com/yjg30737/windows-text-generation-inference-example">Run with WSL & Docker</a>,
-                <a href="https://kaitchup.substack.com/p/serve-large-language-models-from">Run again with WSL & Docker</a>,
-                <a href="https://vilsonrodrigues.medium.com/serving-falcon-models-with-text-generation-inference-tgi-5f32005c663b">External usage</a>,
-                <a href="https://huggingface.co/blog/tgi-messages-api">Use with OpenAI / langchain / llama-index client</a>
-            </td>
-            <td>Service, Linux-only</td>
-        </tr>
-        <tr>
-            <td>Triton Inference Server</td>
-            <td>
-                <a href="https://github.com/triton-inference-server/pytriton/tree/main">Github</a>
-                <a href="https://github.com/triton-inference-server/pytriton/tree/main">pytriton Github</a>
-            </td>
-            <td> </td>
-            <td>Service, Linux-only</td>
+            <td style="font-size:20px">SDK</td>
+            <td style="font-size:20px">Documentation</td>
+            <td style="font-size:20px">Examples</td>
+            <td style="font-size:20px">Comment</td>
         </tr>
         <tr>
             <td>LangChain</td>
             <td> </td>
             <td> </td>
-            <td>Framework</td>
+            <td> </td>
         </tr>
         <tr>
             <td>Llama-index</td>
@@ -183,7 +208,7 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td>
                 <a href="https://github.com/run-llama/llama_index/tree/main/docs/examples/llm">Official list of notebooks</a>
             </td>
-            <td>Framework</td>
+            <td> </td>
         </tr>
         <tr>
             <td>EmbedChain</td>
@@ -202,9 +227,9 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td> </td>
         </tr>
         <tr>
-            <td colspan=4; style="font-size:20px">
-                - Further readings -
-            </td>
+            <th colspan=4; style="text-align:center; font-size:20px"> 
+            - Further readings - 
+            </th>
         </tr>
         <tr>
             <td colspan=4;>
@@ -216,13 +241,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
                 <a href="https://huggingface.co/spaces/mike-ravkine/can-ai-code-results">can-ai-code-results</a>,
             </td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+             * 
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
-    <! ----------------- 2. Compression, Quantization ------------------>
+    <! -------------- 2. Compression, Quantization, Pruning -------------->
     <thead>
         <tr>
-            <th colspan=4; style="text-align:center; font-size:30px">2. Compression, Quantization</th>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            2. Compression, Quantization, Pruning
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -342,13 +376,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
                 <a href="https://arxiv.org/pdf/2310.19102.pdf">2310</a>
             </td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            *
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
     <! ----------------- 3. Evaluation ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">3. Evaluation</th>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            3. Evaluation
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -376,13 +419,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
                 <a href="https://github.com/confident-ai/deepeval">Github</a>
             </td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            *
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
     <! ----------------- 4. Prompt Engineering ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">4. Prompt Engineering</th>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            4. Prompt Engineering
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -404,13 +456,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
         <tr>
             <td>Prompt injection</td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            *
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
     <! ----------------- 5. Data Ingestion ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">5. Data Ingestion</th>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            5. Data Ingestion
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -454,13 +515,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
                 </a>
             </td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            *
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
     <! ----------------- 6. Retrieval-Augmented Generation ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">6. Retrieval-Augmented Generation</th>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            6. Retrieval-Augmented Generation
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -482,13 +552,22 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
         <tr>
             <td>self-RAG</td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            *
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
     <! ----------------- 7. Finetuning ------------------>
     <thead>
         <tr>
-            <th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px">7. Finetuning</th>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            7. Finetuning
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -526,7 +605,11 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td>DPO: Direct Preference Optimization</td>
             <td> </td>
             <td> </td>
-            <td> </td>
+            <td>
+                <a href="https://arxiv.org/pdf/2305.18290">
+                    <div style="text-align: center;">2305</div>
+                </a>
+            </td>
         </tr>
         <tr>
             <td>SPIN: Self-Play Finetuning</td>
@@ -555,6 +638,16 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td> </td>
         </tr>
         <tr>
+            <td>GaLore: Gradient Low Rank Projection</td>
+            <td> </td>
+            <td> </td>
+            <td>
+                <a href="https://arxiv.org/pdf/2403.03507">
+                    <div style="text-align: center;">2403</div>
+                </a>
+            </td>
+        </tr>
+        <tr>
             <td>ORPO: Odds Ratio Preference Optimization</td>
             <td> </td>
             <td> </td>
@@ -564,36 +657,74 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
                 </a>
             </td>
         </tr>
+        <tr>
+            <td>DNO: Direct Nash Optimization</td>
+            <td> </td>
+            <td> </td>
+            <td>
+                <a href="https://arxiv.org/pdf/2404.03715">
+                    <div style="text-align: center;">2404</div>
+                </a>
+            </td>
+        </tr>
         <! ----------------- 7.2 Frameworks ------------------>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> </th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
         <tr>
             <td style="font-size:20px">Framework</td>
             <td style="font-size:20px">Documentation</td>
             <td style="font-size:20px">Examples</td>
-            <td style="font-size:20px">Paper</td>
+            <td style="font-size:20px">Comment</td>
         </tr>
-        <tr>
-            <td>HF autotrain-advanced</td>
+            <td>TRL</td>
             <td>
-                <a href="https://github.com/huggingface/autotrain-advanced">
+                <a href="https://github.com/huggingface/trl">
                 Github
-                </a>
+                </a>,
+                <a href="https://github.com/huggingface/trl/tree/main/examples/scripts">
+                Finetuning scripts
+                </a>, 
             </td>
             <td> </td>
             <td> </td>
         </tr>
         <tr>
-            <td colspan=4; style="height:100%; width:100%; text-align:center; style="font-size:20px">
-                - Further readings -
+            <td>Axolotl</td>
+            <td>
+                <a href="https://github.com/OpenAccess-AI-Collective/axolotl">
+                Github
+                </a>,
+                <a href="https://github.com/OpenAccess-AI-Collective/axolotl/blob/main/src/axolotl/cli/train.py">
+                Finetuning script
+                </a>, 
             </td>
+            <td> </td>
+            <td>Based on TRL, Multi-GPU with Accelerate</td>
         </tr>
         <tr>
-            <td colspan=4;>
-                <a href="https://github.com/huggingface/alignment-handbook/tree/main">HF alignment handbook</a>,
+            <td>HF alignment handbook</td>
+            <td>
+                <a href="https://github.com/huggingface/alignment-handbook/tree/main">
+                Github
+                </a>,
+                <a href="https://github.com/huggingface/alignment-handbook/tree/main/scripts">
+                Finetuning scripts
+                </a>, 
             </td>
+            <td> </td>
+            <td>Based on TRL, Multi-GPU with Accelerate</td>
         </tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"> * </th></tr>
-        <tr><th colspan=4; style="height:100%; width:100%; text-align:center; font-size:30px"></th></tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            *
+            </th>
+        </tr>
+        <tr>
+            <th colspan=4; style="text-align:center; font-size:30px">
+            </th>
+        </tr>
     </tbody>
     <! ----------------- 8. Model aggregation ------------------>
     <thead>
@@ -710,4 +841,3 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
 </table>
 
 
-https://python.plainenglish.io/intruct-fine-tuning-mistral-7b-model-with-your-custom-data-7eb22921a483
