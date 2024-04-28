@@ -717,6 +717,19 @@ We dedicate a docker container with name `tgi-service` to a TGI-based LLM backen
             <td>Based on TRL, Multi-GPU with Accelerate</td>
         </tr>
         <tr>
+            <td>Adapters</td>
+            <td>
+                <a href="https://github.com/adapter-hub/adapters/tree/main">
+                Github
+                </a>,
+                <a href="https://github.com/adapter-hub/adapters/tree/main/examples/pytorch">
+                Train adapters around LLM or BERT models
+                </a>, 
+            </td>
+            <td> </td>
+            <td>Based on TRL, Multi-GPU with Accelerate</td>
+        </tr>
+        <tr>
             <th colspan=4; style="text-align:center; font-size:30px">
             *
             </th>
