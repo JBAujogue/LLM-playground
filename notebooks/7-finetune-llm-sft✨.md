@@ -13,7 +13,14 @@ jupyter:
 ---
 
 <!-- #region -->
-References:
+
+The two following projects are managed by Huggingface and are at the core of LLM finetuning:
+- [TRL](https://github.com/huggingface/trl/tree/main/examples/scripts)
+- [alignment-handbook](https://github.com/huggingface/alignment-handbook/tree/main/scripts)
+
+The `alignment-handbook` project can serve as a model factory.
+
+Other references:
 - Huggingface Supervized Fine-Tuning [tutorial guide](https://huggingface.co/docs/trl/sft_trainer).
 - W&B [tutorial guide](https://wandb.ai/capecape/alpaca_ft/reports/How-to-Fine-tune-an-LLM-Part-3-The-HuggingFace-Trainer--Vmlldzo1OTEyNjMy).
 - Confident-AI [tutorial guide](https://www.confident-ai.com/blog/the-ultimate-guide-to-fine-tune-llama-2-with-llm-evaluations#evaluating-a-fine-tuned-llm-with-deepeval).
